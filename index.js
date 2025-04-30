@@ -1,25 +1,85 @@
 const express = require('express');
 const cors = require('cors');
+const { google } = require('googleapis');
+require('dotenv').config();
 const app = express();
 
-// Middleware
 app.use(cors());
 
-// Endpoint de prueba
+// Autenticación con Google
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+const auth = new google.auth.GoogleAuth({
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
+});
+
+// Endpoint raíz
 app.get('/', (req, res) => {
   res.send('Servidor backend funcionando');
 });
 
-// Endpoint de tareas
-app.get('/api/tasks', (req, res) => {
-  res.json([
-    { id: 1, name: 'Tarea 1', description: 'Descripción de tarea 1' },
-    { id: 2, name: 'Tarea 2', description: 'Descripción de tarea 2' },
-    { id: 3, name: 'Tarea 3', description: 'Descripción de tarea 3' }
-  ]);
+// Endpoint para tareas
+app.get('/api/tasks', async (req, res) => {
+  try {
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.SHEET_ID,
+      range: 'Tareas!A2:G',
+    });
+
+    const rows = response.data.values;
+
+    if (!rows || rows.length === 0) return res.json([]);
+
+    const tasks = rows.map((row, index) => ({
+      id: index + 1,
+      tarea: row[0] || '',
+      proyecto: row[1] || '',
+      responsable: row[2] || '',
+      fechaInicio: row[3] || '',
+      fechaFin: row[4] || '',
+      fechaEjecucion: row[5] || '',
+      estado: row[6] || '',
+    }));
+
+    res.json(tasks);
+  } catch (err) {
+    console.error('Error al leer tareas:', err);
+    res.status(500).send('Error al obtener tareas');
+  }
 });
 
-// Puerto asignado por Render
+// Endpoint para proyectos
+app.get('/api/projects', async (req, res) => {
+  try {
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.SHEET_ID,
+      range: 'Proyectos!A2:B',
+    });
+
+    const rows = response.data.values;
+
+    if (!rows || rows.length === 0) return res.json([]);
+
+    const projects = rows.map((row, index) => ({
+      id: index + 1,
+      nombre: row[0] || '',
+      descripcion: row[1] || '',
+    }));
+
+    res.json(projects);
+  } catch (err) {
+    console.error('Error al leer proyectos:', err);
+    res.status(500).send('Error al obtener proyectos');
+  }
+});
+
+// Puerto
 const port = process.env.PORT || 10000;
 app.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
