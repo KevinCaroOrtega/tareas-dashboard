@@ -25,7 +25,7 @@ app.get('/api/tasks', async (req, res) => {
     const sheets = google.sheets({ version: 'v4', auth: client });
 
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: 'Tareas!A2:G',
     });
 
@@ -58,7 +58,7 @@ app.get('/api/projects', async (req, res) => {
     const sheets = google.sheets({ version: 'v4', auth: client });
 
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: 'Proyectos!A2:B',
     });
 
