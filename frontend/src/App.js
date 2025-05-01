@@ -6,7 +6,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://taula.onrender.com/api/tasks')  // Llama al backend real
+    fetch('https://taula.onrender.com/api/tasks')
       .then(response => response.json())
       .then(data => {
         setTasks(data);
@@ -26,9 +26,14 @@ function App() {
       ) : (
         <ul>
           {tasks.map((task) => (
-            <li key={task.id}>
-              <h2>{task.name}</h2>
-              <p>{task.description}</p>
+            <li key={task.id} className="task-item">
+              <h2>{task.tarea}</h2>
+              <p><strong>Proyecto:</strong> {task.proyecto}</p>
+              <p><strong>Responsable:</strong> {task.responsable}</p>
+              <p><strong>Inicio:</strong> {task.fechaInicio}</p>
+              <p><strong>Fin:</strong> {task.fechaFin}</p>
+              <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
+              <p><strong>Estado:</strong> {task.estado}</p>
             </li>
           ))}
         </ul>
@@ -38,3 +43,4 @@ function App() {
 }
 
 export default App;
+
