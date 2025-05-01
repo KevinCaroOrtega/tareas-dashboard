@@ -14,7 +14,7 @@ const auth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
 });
 
-// Endpoint raíz para confirmar que el backend funciona
+// Endpoint para verificar que el backend funciona
 app.get('/api', (req, res) => {
   res.send('Servidor backend funcionando');
 });
@@ -31,6 +31,7 @@ app.get('/api/tasks', async (req, res) => {
     });
 
     const rows = response.data.values;
+
     if (!rows || rows.length === 0) return res.json([]);
 
     const tasks = rows.map((row, index) => ({
@@ -63,6 +64,7 @@ app.get('/api/projects', async (req, res) => {
     });
 
     const rows = response.data.values;
+
     if (!rows || rows.length === 0) return res.json([]);
 
     const projects = rows.map((row, index) => ({
@@ -78,10 +80,10 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
-// ===== SERVIR EL FRONTEND REACT DESDE LA CARPETA BUILD =====
+// Servir el frontend React desde la carpeta build
 app.use(express.static(path.join(__dirname, 'build')));
 
-// Ruta wildcard para redirigir todo a React
+// Redirigir todo lo demás a React
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
