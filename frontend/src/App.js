@@ -7,8 +7,15 @@ function App() {
 
   useEffect(() => {
     fetch('https://taula.onrender.com/api/tasks')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          console.error("Error en la respuesta:", response);
+          throw new Error("Error en la respuesta de la API");
+        }
+        return response.json();
+      })
       .then(data => {
+        console.log("Datos recibidos:", data); // Para ver lo que se está recibiendo
         setTasks(data);
         setLoading(false);
       })
@@ -25,17 +32,21 @@ function App() {
         <p>Cargando datos...</p>
       ) : (
         <ul>
-          {tasks.map((task) => (
-            <li key={task.id} className="task-item">
-              <h2>{task.tarea}</h2>
-              <p><strong>Proyecto:</strong> {task.proyecto}</p>
-              <p><strong>Responsable:</strong> {task.responsable}</p>
-              <p><strong>Inicio:</strong> {task.fechaInicio}</p>
-              <p><strong>Fin:</strong> {task.fechaFin}</p>
-              <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
-              <p><strong>Estado:</strong> {task.estado}</p>
-            </li>
-          ))}
+          {tasks.length === 0 ? (
+            <p>No hay tareas disponibles.</p>
+          ) : (
+            tasks.map((task) => (
+              <li key={task.id} className="task-item">
+                <h2>{task.tarea}</h2>
+                <p><strong>Proyecto:</strong> {task.proyecto}</p>
+                <p><strong>Responsable:</strong> {task.responsable}</p>
+                <p><strong>Inicio:</strong> {task.fechaInicio}</p>
+                <p><strong>Fin:</strong> {task.fechaFin}</p>
+                <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
+                <p><strong>Estado:</strong> {task.estado}</p>
+              </li>
+            ))
+          )}
         </ul>
       )}
     </div>
@@ -43,4 +54,3 @@ function App() {
 }
 
 export default App;
-
