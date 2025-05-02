@@ -43,14 +43,13 @@ app.get('/api/tareas', async (req, res) => {
 
     // Estructurar los datos
     const tareasList = tareas.map((tarea) => ({
-      id: tarea[0],  // Añadir un id para la lista de tareas
-      tarea: tarea[1],
-      proyecto: tarea[2],
-      responsable: tarea[3],
-      fechaInicio: tarea[4],
-      fechaFin: tarea[5],
-      fechaEjecucion: tarea[6],
-      estado: tarea[7],
+      tarea: tarea[0],
+      proyecto: tarea[1],
+      responsable: tarea[2],
+      fechaInicio: tarea[3],
+      fechaFin: tarea[4],
+      fechaEjecucion: tarea[5],
+      estado: tarea[6],
     }));
 
     res.json(tareasList);
