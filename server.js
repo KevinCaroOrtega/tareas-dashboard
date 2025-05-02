@@ -4,20 +4,16 @@ const { google } = require('googleapis');
 const credentials = require('./tareas-dashboard-credentials.json');
 const cors = require('cors');
 
-// Crear la aplicación Express
 const app = express();
 const port = 3000;
 
-// Middleware para habilitar CORS
 app.use(cors());
-
-// Middleware para poder recibir datos en formato JSON (POST)
 app.use(express.json());
 
-// Servir archivos estáticos desde la carpeta frontend/public
-app.use(express.static(path.join(__dirname, 'frontend', 'public')));
+// Servir archivos estáticos del build de React
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
-// Configurar la autenticación con Google Sheets
+// Configuración de autenticación con Google Sheets
 const auth = new google.auth.JWT(
   credentials.client_email,
   null,
@@ -26,22 +22,19 @@ const auth = new google.auth.JWT(
 );
 
 const sheets = google.sheets({ version: 'v4', auth });
-
-// ID de la hoja de cálculo de Google
 const SPREADSHEET_ID = '1fiNGPPI7DYcKgFHJnZDT0nk1oilkQUe2BZB1cWHELro';
 
-// Ruta para obtener las tareas desde Google Sheets
+// GET tareas
 app.get('/api/tareas', async (req, res) => {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Tareas!A:G', // Rango de datos en la hoja de tareas
+      range: 'Tareas!A:G',
     });
 
     const tareas = response.data.values;
-    const headers = tareas.shift(); // Remover las cabeceras
+    const headers = tareas.shift();
 
-    // Estructurar los datos
     const tareasList = tareas.map((tarea) => ({
       tarea: tarea[0],
       proyecto: tarea[1],
@@ -59,53 +52,38 @@ app.get('/api/tareas', async (req, res) => {
   }
 });
 
-// Ruta para agregar una nueva tarea a Google Sheets
-app.post('/api/add-task', async (req, res) => {
-  const { tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion, estado } = req.body;
-
+// POST tarea nueva
+app.post('/api/tareas', async (req, res) => {
   try {
-    const newTask = [
-      '', // La columna ID la manejaremos como un autoincremento en la base de datos
-      tarea,
-      proyecto,
-      responsable,
-      fechaInicio,
-      fechaFin,
-      fechaEjecucion,
-      estado
-    ];
+    const { tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion, estado } = req.body;
 
-    await sheets.spreadsheets.values.append({
+    const request = {
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Tareas!A1',  // Añadir la nueva tarea en la hoja "Tareas"
-      valueInputOption: 'RAW',
+      range: 'Tareas!A:G',
+      valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
       resource: {
-        values: [newTask],
+        values: [[tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion || '', estado || 'Pendiente']],
       },
-    });
+    };
 
-    res.json({
-      id: newTask[0],  // Deberás gestionar el ID de alguna forma
-      tarea: newTask[1],
-      proyecto: newTask[2],
-      responsable: newTask[3],
-      fechaInicio: newTask[4],
-      fechaFin: newTask[5],
-      fechaEjecucion: newTask[6],
-      estado: newTask[7],
+    const response = await sheets.spreadsheets.values.append(request);
+    res.status(201).json({
+      message: 'Tarea agregada con éxito',
+      tarea: { tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion, estado },
     });
   } catch (error) {
-    console.error('Error al agregar la tarea:', error);
-    res.status(500).json({ error: 'Error al agregar la tarea' });
+    console.error('Error al agregar tarea:', error);
+    res.status(500).json({ error: 'Error al agregar tarea' });
   }
 });
 
-// Servir el archivo HTML principal (index.html) cuando se accede a la raíz
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'public', 'index.html'));
+// Fallback para React (SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
 });
 
-// Iniciar el servidor
+// Iniciar servidor
 app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+  console.log(`Servidor corriendo en http://localhost:${port}`);
 });

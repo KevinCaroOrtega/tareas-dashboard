@@ -14,12 +14,10 @@ function App() {
     estado: 'Pendiente',
   });
 
-  // Cargar tareas al iniciar
   useEffect(() => {
-    fetch('https://taula.onrender.com/api/tareas') // Cambiar por la URL de tu servidor
+    fetch('https://taula.onrender.com/api/tareas')
       .then(response => {
         if (!response.ok) {
-          console.error("Error en la respuesta:", response);
           throw new Error("Error en la respuesta de la API");
         }
         return response.json();
@@ -34,7 +32,6 @@ function App() {
       });
   }, []);
 
-  // Función para agregar una nueva tarea
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewTask({
@@ -44,7 +41,6 @@ function App() {
   };
 
   const handleAddTask = () => {
-    // Verificar que todos los campos estén llenos
     if (
       !newTask.tarea ||
       !newTask.proyecto ||
@@ -52,22 +48,34 @@ function App() {
       !newTask.fechaInicio ||
       !newTask.fechaFin
     ) {
-      alert('Por favor, complete todos los campos.');
+      alert('Por favor, complete todos los campos requeridos.');
       return;
     }
 
-    // Enviar la nueva tarea al backend
-    fetch('https://taula.onrender.com/api/add-task', { // Cambiar por la URL de tu servidor
+    fetch('https://taula.onrender.com/api/tareas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(newTask),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error al agregar tarea');
+        }
+        return response.json();
+      })
       .then((data) => {
-        setTasks([...tasks, data]);  // Agregar tarea a la lista local
-        setNewTask({ tarea: '', proyecto: '', responsable: '', fechaInicio: '', fechaFin: '', fechaEjecucion: '', estado: 'Pendiente' });
+        setTasks([...tasks, data.tarea]);
+        setNewTask({
+          tarea: '',
+          proyecto: '',
+          responsable: '',
+          fechaInicio: '',
+          fechaFin: '',
+          fechaEjecucion: '',
+          estado: 'Pendiente',
+        });
       })
       .catch((error) => {
         console.error('Error al agregar la tarea:', error);
@@ -84,8 +92,8 @@ function App() {
           {tasks.length === 0 ? (
             <p>No hay tareas disponibles.</p>
           ) : (
-            tasks.map((task) => (
-              <li key={task.id} className="task-item">
+            tasks.map((task, index) => (
+              <li key={index} className="task-item">
                 <h2>{task.tarea}</h2>
                 <p><strong>Proyecto:</strong> {task.proyecto}</p>
                 <p><strong>Responsable:</strong> {task.responsable}</p>
@@ -99,42 +107,19 @@ function App() {
         </ul>
       )}
 
-      {/* Formulario para agregar una nueva tarea */}
       <div>
         <h2>Agregar nueva tarea</h2>
-        <input
-          type="text"
-          name="tarea"
-          value={newTask.tarea}
-          placeholder="Nombre de la tarea"
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="proyecto"
-          value={newTask.proyecto}
-          placeholder="Proyecto"
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="responsable"
-          value={newTask.responsable}
-          placeholder="Responsable"
-          onChange={handleChange}
-        />
-        <input
-          type="date"
-          name="fechaInicio"
-          value={newTask.fechaInicio}
-          onChange={handleChange}
-        />
-        <input
-          type="date"
-          name="fechaFin"
-          value={newTask.fechaFin}
-          onChange={handleChange}
-        />
+        <input type="text" name="tarea" value={newTask.tarea} placeholder="Nombre de la tarea" onChange={handleChange} />
+        <input type="text" name="proyecto" value={newTask.proyecto} placeholder="Proyecto" onChange={handleChange} />
+        <input type="text" name="responsable" value={newTask.responsable} placeholder="Responsable" onChange={handleChange} />
+        <input type="date" name="fechaInicio" value={newTask.fechaInicio} onChange={handleChange} />
+        <input type="date" name="fechaFin" value={newTask.fechaFin} onChange={handleChange} />
+        <input type="date" name="fechaEjecucion" value={newTask.fechaEjecucion} onChange={handleChange} />
+        <select name="estado" value={newTask.estado} onChange={handleChange}>
+          <option value="Pendiente">Pendiente</option>
+          <option value="En progreso">En progreso</option>
+          <option value="Completada">Completada</option>
+        </select>
         <button onClick={handleAddTask}>Agregar tarea</button>
       </div>
     </div>
