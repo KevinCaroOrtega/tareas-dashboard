@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Tareas</title>
+    <title>Dashboard de Tareas</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         /* Estilos básicos para las funcionalidades añadidas */
@@ -284,246 +284,379 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <div class="profile-header">
-                <div class="profile-actions">
-                    <span class="profile-link" id="logout-btn">Cerrar sesión</span>
-                </div>
-                <div class="profile-info">
-                    <img class="profile-pic" id="profile-pic" src="/default-profile.png" alt="Profile">
-                    <h2 class="user-name" id="user-name">Usuario</h2>
-                    <p class="user-email" id="user-email">usuario@ejemplo.com</p>
-                </div>
-            </div>
-            <div class="sidebar-card card-green" id="tareas-hoy-card">
-                0 tareas para hoy
-            </div>
-            <div class="sidebar-card card-blue">Reunión con el equipo a las 10:00 AM</div>
-            <div class="sidebar-card card-yellow" id="tareas-proximas-card">
-                0 tareas próximas
-            </div>
-        </div>
+    <div id="root"></div>
 
-        <div class="main-content">
-            <div class="header">
-                <div class="greeting-container">
-                    <h1 class="greeting" id="greeting">¡Buenos días!</h1>
-                    <p class="subtitle" id="subtitle">No tienes tareas para hoy</p>
-                    <div class="action-buttons">
-                        <button class="btn calendar-btn" id="toggle-calendar-btn">
-                            <i class="icon-calendar"></i> Mostrar Calendario
-                        </button>
-                        <button class="btn completed-btn" id="toggle-completed-btn">
-                            <i class="icon-check"></i> Mostrar Completadas
-                        </button>
+    <!-- Contenedor principal de la aplicación React -->
+    <div id="app">
+        <div class="dashboard-container">
+            <div class="sidebar">
+                <div class="profile-header">
+                    <div class="profile-actions">
+                        <span class="profile-link" id="logout-btn">Cerrar sesión</span>
+                    </div>
+                    <div class="profile-info">
+                        <img class="profile-pic" id="profile-pic" src="/default-profile.png" alt="Profile">
+                        <h2 class="user-name" id="user-name">Usuario</h2>
+                        <p class="user-email" id="user-email">usuario@ejemplo.com</p>
                     </div>
                 </div>
-                <div class="header-buttons">
-                    <button class="btn green" id="new-task-btn">+ Nueva tarea</button>
-                    <button class="btn purple" id="new-project-btn">+ Nuevo proyecto</button>
+                <div class="sidebar-card card-green" id="tareas-hoy-card">
+                    0 tareas para hoy
+                </div>
+                <div class="sidebar-card card-blue">Reunión con el equipo a las 10:00 AM</div>
+                <div class="sidebar-card card-yellow" id="tareas-proximas-card">
+                    0 tareas próximas
                 </div>
             </div>
 
-            <div class="toast-message" id="toast-message" style="display: none;"></div>
-
-            <div class="calendar-view" id="calendar-view" style="display: none;">
-                <div class="calendar-header">
-                    <button id="prev-month-btn">&lt; Anterior</button>
-                    <h2 id="calendar-month-year">ENERO 2023</h2>
-                    <button id="next-month-btn">Siguiente &gt;</button>
-                </div>
-                <div class="calendar-grid" id="calendar-grid">
-                    <!-- Se llenará dinámicamente con JavaScript -->
-                </div>
-            </div>
-
-            <div class="cards" id="cards-view">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Hoy</h3>
-                        <button class="ver-mas-btn" id="ver-mas-hoy-btn" style="display: none;">...</button>
+            <div class="main-content">
+                <div class="header">
+                    <div class="greeting-container">
+                        <h1 class="greeting" id="greeting">¡Buenos días!</h1>
+                        <p class="subtitle" id="subtitle">No tienes tareas para hoy</p>
+                        <div class="action-buttons">
+                            <button class="btn calendar-btn" id="toggle-calendar-btn">
+                                <i class="icon-calendar"></i> Mostrar Calendario
+                            </button>
+                            <button class="btn completed-btn" id="toggle-completed-btn">
+                                <i class="icon-check"></i> Mostrar Completadas
+                            </button>
+                        </div>
                     </div>
-                    <ul id="tareas-hoy-list">
-                        <li>No hay tareas para hoy</li>
-                    </ul>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Esta semana</h3>
-                        <button class="ver-mas-btn" id="ver-mas-semana-btn" style="display: none;">...</button>
+                    <div class="header-buttons">
+                        <button class="btn green" id="new-task-btn">+ Nueva tarea</button>
+                        <button class="btn purple" id="new-project-btn">+ Nuevo proyecto</button>
                     </div>
-                    <ul id="tareas-semana-list">
-                        <li>No hay tareas esta semana</li>
-                    </ul>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3>En el mes</h3>
-                        <button class="ver-mas-btn" id="ver-mas-mes-btn" style="display: none;">...</button>
+                <div class="toast-message" id="toast-message" style="display: none;"></div>
+
+                <div class="calendar-view" id="calendar-view" style="display: none;">
+                    <div class="calendar-header">
+                        <button id="prev-month-btn">&lt; Anterior</button>
+                        <h2 id="calendar-month-year">ENERO 2023</h2>
+                        <button id="next-month-btn">Siguiente &gt;</button>
                     </div>
-                    <ul id="tareas-mes-list">
-                        <li>No hay tareas este mes</li>
-                    </ul>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </div>
                 </div>
-            </div>
 
-            <table class="task-table" id="tasksTable">
-                <thead>
-                    <tr>
-                        <th>Tarea</th>
-                        <th>Proyecto</th>
-                        <th>Responsable</th>
-                        <th>Fecha de inicio</th>
-                        <th>Fecha fin</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="tasksTableBody">
-                    <!-- Se llenará dinámicamente con JavaScript -->
-                </tbody>
-            </table>
+                <div class="cards" id="cards-view">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Hoy</h3>
+                            <button class="ver-mas-btn" id="ver-mas-hoy-btn" style="display: none;">...</button>
+                        </div>
+                        <ul id="tareas-hoy-list">
+                            <li>No hay tareas para hoy</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Esta semana</h3>
+                            <button class="ver-mas-btn" id="ver-mas-semana-btn" style="display: none;">...</button>
+                        </div>
+                        <ul id="tareas-semana-list">
+                            <li>No hay tareas esta semana</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>En el mes</h3>
+                            <button class="ver-mas-btn" id="ver-mas-mes-btn" style="display: none;">...</button>
+                        </div>
+                        <ul id="tareas-mes-list">
+                            <li>No hay tareas este mes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <table class="task-table" id="task-table">
+                    <thead>
+                        <tr>
+                            <th>Tarea</th>
+                            <th>Proyecto</th>
+                            <th>Responsable</th>
+                            <th>Fecha de inicio</th>
+                            <th>Fecha fin</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="task-table-body">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal Nueva Tarea -->
+        <div class="modal" id="task-modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Nueva tarea</h2>
+                <form id="task-form">
+                    <div class="input-container">
+                        <label>Nombre de la tarea *</label>
+                        <input type="text" id="task-name" name="tarea" placeholder="Ej: Revisar diseño" required>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label>Proyecto *</label>
+                        <select id="task-project" name="proyecto" class="form-control" required>
+                            <option value="">Seleccione un proyecto</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label>Responsable *</label>
+                        <input type="text" id="task-responsible" name="responsable" placeholder="Ej: María Gómez" required>
+                    </div>
+
+                    <div class="input-container">
+                        <label>Fecha de inicio *</label>
+                        <input type="date" id="task-start-date" name="fechaInicio" required>
+                    </div>
+
+                    <div class="input-container">
+                        <label>Fecha fin *</label>
+                        <select id="task-end-date-option" name="fechaFinOption" class="form-control" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="hoy">Hoy</option>
+                            <option value="3dias">3 días</option>
+                            <option value="1semana">1 semana</option>
+                            <option value="1mes">1 mes</option>
+                            <option value="personalizado">Personalizado</option>
+                        </select>
+                    </div>
+
+                    <div class="input-container" id="custom-end-date-container" style="display: none;">
+                        <label>Seleccionar fecha específica *</label>
+                        <input type="date" id="task-custom-end-date" name="fechaFin">
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" id="cancel-task-btn">Cancelar</button>
+                        <button type="submit" class="btn-confirm" id="confirm-task-btn">Agregar tarea</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Nuevo Proyecto -->
+        <div class="modal" id="project-modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Agregar nuevo proyecto</h2>
+                <form id="project-form">
+                    <div class="input-container">
+                        <label>Nombre del proyecto *</label>
+                        <input type="text" id="project-name" name="nombreProyecto" placeholder="Ej: Sitio web corporativo" required>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label>Descripción *</label>
+                        <textarea id="project-description" name="descripcionProyecto" placeholder="Detalles del proyecto" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" id="cancel-project-btn">Cancelar</button>
+                        <button type="submit" class="btn-confirm" id="confirm-project-btn">Crear proyecto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal para tareas de hoy -->
+        <div class="modal" id="today-tasks-modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Tareas para hoy</h2>
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Tarea</th>
+                            <th>Proyecto</th>
+                            <th>Responsable</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="today-tasks-modal-body">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+                <button class="btn-close" id="close-today-modal-btn">Cerrar</button>
+            </div>
+        </div>
+
+        <!-- Modal para tareas de esta semana -->
+        <div class="modal" id="week-tasks-modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Tareas para esta semana</h2>
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Tarea</th>
+                            <th>Proyecto</th>
+                            <th>Responsable</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="week-tasks-modal-body">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+                <button class="btn-close" id="close-week-modal-btn">Cerrar</button>
+            </div>
+        </div>
+
+        <!-- Modal para tareas de este mes -->
+        <div class="modal" id="month-tasks-modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Tareas para este mes</h2>
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Tarea</th>
+                            <th>Proyecto</th>
+                            <th>Responsable</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="month-tasks-modal-body">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+                <button class="btn-close" id="close-month-modal-btn">Cerrar</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Nueva Tarea -->
-    <div class="modal" id="taskModal" style="display: none;">
-        <div class="modal-content">
-            <h2>Nueva tarea</h2>
+    <!-- Scripts de React y Babel -->
+    <script src="https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/babel-standalone@7.12.9/babel.min.js"></script>
+    
+    <!-- Tu aplicación React -->
+    <script type="text/babel" src="App.js"></script>
+
+    <script>
+        // Este script manejará la interacción con el backend hasta que la app React esté completamente implementada
+        
+        // Manejar el envío del formulario de tarea
+        document.getElementById('task-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            <div class="input-container">
-                <label>Nombre de la tarea *</label>
-                <input type="text" id="taskName" placeholder="Ej: Revisar diseño" required>
-            </div>
+            const formData = new FormData(e.target);
+            const taskData = Object.fromEntries(formData.entries());
             
-            <div class="input-container">
-                <label>Proyecto *</label>
-                <select id="taskProject" class="form-control" required>
-                    <option value="">Seleccione un proyecto</option>
-                </select>
-            </div>
+            // Calcular fecha fin si es necesario
+            if (taskData.fechaFinOption !== 'personalizado') {
+                taskData.fechaFin = calcularFechaFin(taskData.fechaFinOption, taskData.fechaInicio);
+            }
             
-            <div class="input-container">
-                <label>Responsable *</label>
-                <input type="text" id="taskResponsible" placeholder="Ej: María Gómez" required>
-            </div>
+            fetch('/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(taskData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Cerrar modal y actualizar UI
+                document.getElementById('task-modal').style.display = 'none';
+                showToast('Tarea agregada correctamente');
+                // Aquí deberías actualizar el estado de React o recargar los datos
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error al agregar la tarea');
+            });
+        });
 
-            <div class="input-container">
-                <label>Fecha de inicio *</label>
-                <input type="date" id="taskStartDate" required>
-            </div>
-
-            <div class="input-container">
-                <label>Fecha fin *</label>
-                <select id="taskEndDateOption" class="form-control" required>
-                    <option value="">Seleccione una opción</option>
-                    <option value="hoy">Hoy</option>
-                    <option value="3dias">3 días</option>
-                    <option value="1semana">1 semana</option>
-                    <option value="1mes">1 mes</option>
-                    <option value="personalizado">Personalizado</option>
-                </select>
-            </div>
-
-            <div class="input-container" id="custom-end-date-container" style="display: none;">
-                <label>Seleccionar fecha específica *</label>
-                <input type="date" id="taskCustomEndDate">
-            </div>
+        // Manejar el envío del formulario de proyecto
+        document.getElementById('project-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            <div class="modal-actions">
-                <button class="btn-cancel" id="cancelTaskBtn">Cancelar</button>
-                <button class="btn-confirm" id="confirmTaskBtn">Agregar tarea</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Nuevo Proyecto -->
-    <div class="modal" id="project-modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Agregar nuevo proyecto</h2>
+            const formData = new FormData(e.target);
+            const projectData = Object.fromEntries(formData.entries());
             
-            <div class="input-container">
-                <label>Nombre del proyecto *</label>
-                <input type="text" id="project-name" placeholder="Ej: Sitio web corporativo" required>
-            </div>
+            fetch('/api/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(projectData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Cerrar modal y actualizar UI
+                document.getElementById('project-modal').style.display = 'none';
+                showToast('Proyecto creado correctamente');
+                // Aquí deberías actualizar el estado de React o recargar los datos
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error al crear el proyecto');
+            });
+        });
+
+        // Función auxiliar para calcular fechas
+        function calcularFechaFin(opcion, fechaInicio) {
+            const date = new Date(fechaInicio);
             
-            <div class="input-container">
-                <label>Descripción *</label>
-                <textarea id="project-description" placeholder="Detalles del proyecto" rows="4" required></textarea>
-            </div>
+            switch(opcion) {
+                case 'hoy':
+                    return fechaInicio;
+                case '3dias':
+                    date.setDate(date.getDate() + 3);
+                    break;
+                case '1semana':
+                    date.setDate(date.getDate() + 7);
+                    break;
+                case '1mes':
+                    date.setMonth(date.getMonth() + 1);
+                    break;
+            }
             
-            <div class="modal-actions">
-                <button class="btn-cancel" id="cancel-project-btn">Cancelar</button>
-                <button class="btn-confirm" id="confirm-project-btn">Crear proyecto</button>
-            </div>
-        </div>
-    </div>
+            return date.toISOString().split('T')[0];
+        }
 
-    <!-- Modal para tareas de hoy -->
-    <div class="modal" id="today-tasks-modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Tareas para hoy</h2>
-            <table class="task-table">
-                <thead>
-                    <tr>
-                        <th>Tarea</th>
-                        <th>Proyecto</th>
-                        <th>Responsable</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="today-tasks-modal-body">
-                    <!-- Se llenará dinámicamente con JavaScript -->
-                </tbody>
-            </table>
-            <button class="btn-close" id="close-today-modal-btn">Cerrar</button>
-        </div>
-    </div>
+        // Función para mostrar notificaciones
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
 
-    <!-- Modal para tareas de esta semana -->
-    <div class="modal" id="week-tasks-modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Tareas para esta semana</h2>
-            <table class="task-table">
-                <thead>
-                    <tr>
-                        <th>Tarea</th>
-                        <th>Proyecto</th>
-                        <th>Responsable</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="week-tasks-modal-body">
-                    <!-- Se llenará dinámicamente con JavaScript -->
-                </tbody>
-            </table>
-            <button class="btn-close" id="close-week-modal-btn">Cerrar</button>
-        </div>
-    </div>
+        // Event listeners para abrir modales
+        document.getElementById('new-task-btn').addEventListener('click', function() {
+            document.getElementById('task-modal').style.display = 'flex';
+        });
 
-    <!-- Modal para tareas de este mes -->
-    <div class="modal" id="month-tasks-modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Tareas para este mes</h2>
-            <table class="task-table">
-                <thead>
-                    <tr>
-                        <th>Tarea</th>
-                        <th>Proyecto</th>
-                        <th>Responsable</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="month-tasks-modal-body">
-                    <!-- Se llenará dinámicamente con JavaScript -->
-                </tbody>
-            </table>
-            <button class="btn-close" id="close-month-modal-btn">Cerrar</button>
-        </div>
-    </div>
+        document.getElementById('new-project-btn').addEventListener('click', function() {
+            document.getElementById('project-modal').style.display = 'flex';
+        });
 
-    <script src="app.js"></script>
+        // Event listeners para cerrar modales
+        document.getElementById('cancel-task-btn').addEventListener('click', function() {
+            document.getElementById('task-modal').style.display = 'none';
+        });
+
+        document.getElementById('cancel-project-btn').addEventListener('click', function() {
+            document.getElementById('project-modal').style.display = 'none';
+        });
+
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
