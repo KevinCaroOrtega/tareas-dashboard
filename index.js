@@ -84,9 +84,9 @@ app.get('/api/projects', async (req, res) => {
 app.use(express.static(path.join(__dirname, 'build')));
 
 // Redirigir todo lo demás a React
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 // Puerto
 const port = process.env.PORT || 10000;
