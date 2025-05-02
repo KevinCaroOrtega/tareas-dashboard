@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const { google } = require('googleapis');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -11,7 +10,7 @@ app.use(cors());
 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 const auth = new google.auth.GoogleAuth({
   credentials,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
+  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
 });
 
 // Endpoint para verificar que el backend funciona
@@ -79,14 +78,6 @@ app.get('/api/projects', async (req, res) => {
     res.status(500).send('Error al obtener proyectos');
   }
 });
-
-// Servir el frontend React desde la carpeta build
-app.use(express.static(path.join(__dirname, 'build')));
-
-// Redirigir todo lo demás a React
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
 
 // Puerto
 const port = process.env.PORT || 10000;
