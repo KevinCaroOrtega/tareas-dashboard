@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { google } = require('googleapis');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -10,7 +11,7 @@ app.use(cors());
 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 const auth = new google.auth.GoogleAuth({
   credentials,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
 });
 
 // Endpoint para verificar que el backend funciona
@@ -77,6 +78,11 @@ app.get('/api/projects', async (req, res) => {
     console.error('Error al leer proyectos:', err);
     res.status(500).send('Error al obtener proyectos');
   }
+});
+
+// Ruta raíz para evitar "Cannot GET /"
+app.get('/', (req, res) => {
+  res.send('API de tareas backend funcionando');
 });
 
 // Puerto
