@@ -1,90 +1,85 @@
 const express = require('express');
-const path = require('path');
 const { google } = require('googleapis');
-const credentials = require('./tareas-dashboard-credentials.json');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
-const port = 3000;
-
 app.use(cors());
 app.use(express.json());
 
-// Servir archivos estáticos del build de React
-app.use(express.static(path.join(__dirname, 'public')));
+const PORT = process.env.PORT || 3001;
 
-// Configuración de autenticación con Google Sheets
-const auth = new google.auth.JWT(
-  credentials.client_email,
-  null,
-  credentials.private_key,
-  ['https://www.googleapis.com/auth/spreadsheets']
-);
+// Autenticación con Google usando credenciales desde variable de entorno
+const auth = new google.auth.GoogleAuth({
+  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
 
-const sheets = google.sheets({ version: 'v4', auth });
-const SPREADSHEET_ID = '1fiNGPPI7DYcKgFHJnZDT0nk1oilkQUe2BZB1cWHELro';
-
-// GET tareas
+// Endpoint para obtener tareas
 app.get('/api/tareas', async (req, res) => {
-  res.json(tareas);
   try {
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
+
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const range = 'Tareas!A2:G';
+
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: 'Tareas!A:G',
+      spreadsheetId,
+      range,
     });
 
-    const tareas = response.data.values;
-    const headers = tareas.shift();
+    const rows = response.data.values;
 
-    const tareasList = tareas.map((tarea) => ({
-      tarea: tarea[0],
-      proyecto: tarea[1],
-      responsable: tarea[2],
-      fechaInicio: tarea[3],
-      fechaFin: tarea[4],
-      fechaEjecucion: tarea[5],
-      estado: tarea[6],
+    if (!rows || rows.length === 0) {
+      return res.json([]);
+    }
+
+    const tareas = rows.map((row, i) => ({
+      id: i + 1,
+      tarea: row[0] || '',
+      proyecto: row[1] || '',
+      responsable: row[2] || '',
+      fechaInicio: row[3] || '',
+      fechaFin: row[4] || '',
+      fechaEjecucion: row[5] || '',
+      estado: row[6] || '',
     }));
 
-    res.json(tareasList);
+    res.json(tareas);
   } catch (error) {
     console.error('Error al obtener las tareas:', error);
     res.status(500).json({ error: 'Error al obtener las tareas' });
   }
 });
 
-// POST tarea nueva
+// Endpoint para agregar tarea
 app.post('/api/tareas', async (req, res) => {
   try {
     const { tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion, estado } = req.body;
 
-    const request = {
-      spreadsheetId: SPREADSHEET_ID,
-      range: 'Tareas!A:G',
-      valueInputOption: 'USER_ENTERED',
-      insertDataOption: 'INSERT_ROWS',
-      resource: {
-        values: [[tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion || '', estado || 'Pendiente']],
-      },
-    };
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
 
-    const response = await sheets.spreadsheets.values.append(request);
-    res.status(201).json({
-      message: 'Tarea agregada con éxito',
-      tarea: { tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion, estado },
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const range = 'Tareas!A2:G';
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range,
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [[tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion, estado]],
+      },
     });
+
+    res.status(201).json({ message: 'Tarea agregada con éxito' });
   } catch (error) {
-    console.error('Error al agregar tarea:', error);
+    console.error('Error al agregar la tarea:', error);
     res.status(500).json({ error: 'Error al agregar tarea' });
   }
 });
 
-// Fallback para React (SPA)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
-});
-
-// Iniciar servidor
-app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Servidor backend corriendo en el puerto ${PORT}`);
 });
