@@ -52,7 +52,7 @@ function App() {
       return;
     }
 
-    fetch('https://taula.onrender.com/api/tareas', {
+    fetch('https://taula-board.onrender.com/api/tareas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
