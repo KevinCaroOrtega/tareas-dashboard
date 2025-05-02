@@ -52,7 +52,7 @@ function App() {
       return;
     }
   
-    fetch('https://taula.onrender.com/api/tareas', { // URL correcta y coma eliminada
+    fetch('https://taula.onrender.com/api/tareas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,8 +60,10 @@ function App() {
       body: JSON.stringify(newTask),
     })
       .then((response) => {
-        if (!response.ok) throw new Error('Error al agregar tarea');
-        return response.json(); // Aquí fallaba si backend no enviaba JSON
+        if (!response.ok) {
+          throw new Error('Error al agregar tarea');
+        }
+        return response.json();
       })
       .then((data) => {
         setTasks([...tasks, data]);

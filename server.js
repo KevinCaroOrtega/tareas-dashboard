@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Servir archivos estáticos del build de React
-app.use(express.static(path.join(__dirname, 'frontend', 'build')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuración de autenticación con Google Sheets
 const auth = new google.auth.JWT(
@@ -26,6 +26,7 @@ const SPREADSHEET_ID = '1fiNGPPI7DYcKgFHJnZDT0nk1oilkQUe2BZB1cWHELro';
 
 // GET tareas
 app.get('/api/tareas', async (req, res) => {
+  res.json(tareas);
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
