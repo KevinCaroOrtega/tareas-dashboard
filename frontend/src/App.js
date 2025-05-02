@@ -48,11 +48,11 @@ function App() {
       !newTask.fechaInicio ||
       !newTask.fechaFin
     ) {
-      alert('Por favor, complete todos los campos requeridos.');
+      alert('Por favor, complete todos los campos.');
       return;
     }
-
-    fetch('https://taula-board.onrender.com/api/tareas', {
+  
+    fetch('https://taula.onrender.com/api/tareas', { // URL correcta y coma eliminada
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,22 +60,12 @@ function App() {
       body: JSON.stringify(newTask),
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al agregar tarea');
-        }
-        return response.json();
+        if (!response.ok) throw new Error('Error al agregar tarea');
+        return response.json(); // Aquí fallaba si backend no enviaba JSON
       })
       .then((data) => {
-        setTasks([...tasks, data.tarea]);
-        setNewTask({
-          tarea: '',
-          proyecto: '',
-          responsable: '',
-          fechaInicio: '',
-          fechaFin: '',
-          fechaEjecucion: '',
-          estado: 'Pendiente',
-        });
+        setTasks([...tasks, data]);
+        setNewTask({ tarea: '', proyecto: '', responsable: '', fechaInicio: '', fechaFin: '', fechaEjecucion: '', estado: 'Pendiente' });
       })
       .catch((error) => {
         console.error('Error al agregar la tarea:', error);
