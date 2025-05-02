@@ -14,24 +14,26 @@ function App() {
     estado: 'Pendiente',
   });
 
+  // Cargar tareas al iniciar
   useEffect(() => {
     fetch('https://taula.onrender.com/api/tareas')
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
-          throw new Error("Error en la respuesta de la API");
+          throw new Error('Error en la respuesta de la API');
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setTasks(data);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error al obtener las tareas:', error);
         setLoading(false);
       });
   }, []);
 
+  // Manejador de cambios de inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewTask({
@@ -40,38 +42,43 @@ function App() {
     });
   };
 
-  const handleAddTask = () => {
-    if (
-      !newTask.tarea ||
-      !newTask.proyecto ||
-      !newTask.responsable ||
-      !newTask.fechaInicio ||
-      !newTask.fechaFin
-    ) {
-      alert('Por favor, complete todos los campos.');
+  // Agregar una nueva tarea
+  const handleAddTask = async () => {
+    const { tarea, proyecto, responsable, fechaInicio, fechaFin } = newTask;
+
+    if (!tarea || !proyecto || !responsable || !fechaInicio || !fechaFin) {
+      alert('Por favor, complete todos los campos obligatorios.');
       return;
     }
-  
-    fetch('https://taula.onrender.com/api/tareas', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newTask),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al agregar tarea');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setTasks([...tasks, data]);
-        setNewTask({ tarea: '', proyecto: '', responsable: '', fechaInicio: '', fechaFin: '', fechaEjecucion: '', estado: 'Pendiente' });
-      })
-      .catch((error) => {
-        console.error('Error al agregar la tarea:', error);
+
+    try {
+      const response = await fetch('https://taula.onrender.com/api/tareas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTask),
       });
+
+      if (!response.ok) {
+        throw new Error('Error al agregar tarea');
+      }
+
+      const data = await response.json();
+
+      setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
+      setNewTask({
+        tarea: '',
+        proyecto: '',
+        responsable: '',
+        fechaInicio: '',
+        fechaFin: '',
+        fechaEjecucion: '',
+        estado: 'Pendiente',
+      });
+    } catch (error) {
+      console.error('Error al agregar la tarea:', error);
+    }
   };
 
   return (
@@ -79,23 +86,21 @@ function App() {
       <h1>Dashboard de Tareas</h1>
       {loading ? (
         <p>Cargando datos...</p>
+      ) : tasks.length === 0 ? (
+        <p>No hay tareas disponibles.</p>
       ) : (
         <ul>
-          {tasks.length === 0 ? (
-            <p>No hay tareas disponibles.</p>
-          ) : (
-            tasks.map((task, index) => (
-              <li key={index} className="task-item">
-                <h2>{task.tarea}</h2>
-                <p><strong>Proyecto:</strong> {task.proyecto}</p>
-                <p><strong>Responsable:</strong> {task.responsable}</p>
-                <p><strong>Inicio:</strong> {task.fechaInicio}</p>
-                <p><strong>Fin:</strong> {task.fechaFin}</p>
-                <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
-                <p><strong>Estado:</strong> {task.estado}</p>
-              </li>
-            ))
-          )}
+          {tasks.map((task) => (
+            <li key={task.id} className="task-item">
+              <h2>{task.tarea}</h2>
+              <p><strong>Proyecto:</strong> {task.proyecto}</p>
+              <p><strong>Responsable:</strong> {task.responsable}</p>
+              <p><strong>Inicio:</strong> {task.fechaInicio}</p>
+              <p><strong>Fin:</strong> {task.fechaFin}</p>
+              <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
+              <p><strong>Estado:</strong> {task.estado}</p>
+            </li>
+          ))}
         </ul>
       )}
 
