@@ -22,7 +22,7 @@ const auth = new google.auth.JWT(
   credentials.client_email,
   null,
   credentials.private_key,
-  ['https://www.googleapis.com/auth/spreadsheets.readonly']
+  ['https://www.googleapis.com/auth/spreadsheets']
 );
 
 const sheets = google.sheets({ version: 'v4', auth });
@@ -43,13 +43,14 @@ app.get('/api/tareas', async (req, res) => {
 
     // Estructurar los datos
     const tareasList = tareas.map((tarea) => ({
-      tarea: tarea[0],
-      proyecto: tarea[1],
-      responsable: tarea[2],
-      fechaInicio: tarea[3],
-      fechaFin: tarea[4],
-      fechaEjecucion: tarea[5],
-      estado: tarea[6],
+      id: tarea[0],  // Añadir un id para la lista de tareas
+      tarea: tarea[1],
+      proyecto: tarea[2],
+      responsable: tarea[3],
+      fechaInicio: tarea[4],
+      fechaFin: tarea[5],
+      fechaEjecucion: tarea[6],
+      estado: tarea[7],
     }));
 
     res.json(tareasList);
@@ -59,27 +60,44 @@ app.get('/api/tareas', async (req, res) => {
   }
 });
 
-// Ruta para obtener los proyectos desde Google Sheets
-app.get('/api/proyectos', async (req, res) => {
+// Ruta para agregar una nueva tarea a Google Sheets
+app.post('/api/add-task', async (req, res) => {
+  const { tarea, proyecto, responsable, fechaInicio, fechaFin, fechaEjecucion, estado } = req.body;
+
   try {
-    const response = await sheets.spreadsheets.values.get({
+    const newTask = [
+      '', // La columna ID la manejaremos como un autoincremento en la base de datos
+      tarea,
+      proyecto,
+      responsable,
+      fechaInicio,
+      fechaFin,
+      fechaEjecucion,
+      estado
+    ];
+
+    await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Proyectos!A:B', // Rango de datos en la hoja de proyectos
+      range: 'Tareas!A1',  // Añadir la nueva tarea en la hoja "Tareas"
+      valueInputOption: 'RAW',
+      resource: {
+        values: [newTask],
+      },
     });
 
-    const proyectos = response.data.values;
-    const headers = proyectos.shift(); // Remover las cabeceras
-
-    // Estructurar los datos
-    const proyectosList = proyectos.map((proyecto) => ({
-      proyecto: proyecto[0],
-      descripcion: proyecto[1],
-    }));
-
-    res.json(proyectosList);
+    res.json({
+      id: newTask[0],  // Deberás gestionar el ID de alguna forma
+      tarea: newTask[1],
+      proyecto: newTask[2],
+      responsable: newTask[3],
+      fechaInicio: newTask[4],
+      fechaFin: newTask[5],
+      fechaEjecucion: newTask[6],
+      estado: newTask[7],
+    });
   } catch (error) {
-    console.error('Error al obtener los proyectos:', error);
-    res.status(500).json({ error: 'Error al obtener los proyectos' });
+    console.error('Error al agregar la tarea:', error);
+    res.status(500).json({ error: 'Error al agregar la tarea' });
   }
 });
 

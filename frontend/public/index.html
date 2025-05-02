@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Tareas</title>
-    <link rel="stylesheet" href="styles.css">  <!-- Si quieres agregar estilos -->
+    <title>Gestión de Tareas</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         /* Estilos básicos para las funcionalidades añadidas */
         .dashboard-container {
@@ -370,7 +370,7 @@
                 </div>
             </div>
 
-            <table class="task-table" id="task-table">
+            <table class="task-table" id="tasksTable">
                 <thead>
                     <tr>
                         <th>Tarea</th>
@@ -381,7 +381,7 @@
                         <th>Estado</th>
                     </tr>
                 </thead>
-                <tbody id="task-table-body">
+                <tbody id="tasksTableBody">
                     <!-- Se llenará dinámicamente con JavaScript -->
                 </tbody>
             </table>
@@ -389,35 +389,35 @@
     </div>
 
     <!-- Modal Nueva Tarea -->
-    <div class="modal" id="task-modal" style="display: none;">
+    <div class="modal" id="taskModal" style="display: none;">
         <div class="modal-content">
             <h2>Nueva tarea</h2>
             
             <div class="input-container">
                 <label>Nombre de la tarea *</label>
-                <input type="text" id="task-name" placeholder="Ej: Revisar diseño" required>
+                <input type="text" id="taskName" placeholder="Ej: Revisar diseño" required>
             </div>
             
             <div class="input-container">
                 <label>Proyecto *</label>
-                <select id="task-project" class="form-control" required>
+                <select id="taskProject" class="form-control" required>
                     <option value="">Seleccione un proyecto</option>
                 </select>
             </div>
             
             <div class="input-container">
                 <label>Responsable *</label>
-                <input type="text" id="task-responsible" placeholder="Ej: María Gómez" required>
+                <input type="text" id="taskResponsible" placeholder="Ej: María Gómez" required>
             </div>
 
             <div class="input-container">
                 <label>Fecha de inicio *</label>
-                <input type="date" id="task-start-date" required>
+                <input type="date" id="taskStartDate" required>
             </div>
 
             <div class="input-container">
                 <label>Fecha fin *</label>
-                <select id="task-end-date-option" class="form-control" required>
+                <select id="taskEndDateOption" class="form-control" required>
                     <option value="">Seleccione una opción</option>
                     <option value="hoy">Hoy</option>
                     <option value="3dias">3 días</option>
@@ -429,12 +429,12 @@
 
             <div class="input-container" id="custom-end-date-container" style="display: none;">
                 <label>Seleccionar fecha específica *</label>
-                <input type="date" id="task-custom-end-date">
+                <input type="date" id="taskCustomEndDate">
             </div>
             
             <div class="modal-actions">
-                <button class="btn-cancel" id="cancel-task-btn">Cancelar</button>
-                <button class="btn-confirm" id="confirm-task-btn">Agregar tarea</button>
+                <button class="btn-cancel" id="cancelTaskBtn">Cancelar</button>
+                <button class="btn-confirm" id="confirmTaskBtn">Agregar tarea</button>
             </div>
         </div>
     </div>
@@ -524,611 +524,6 @@
         </div>
     </div>
 
-    <script>
-        // Datos de ejemplo (en una aplicación real estos vendrían de una API)
-        let userProfile = {
-            name: "Usuario Ejemplo",
-            email: "usuario@ejemplo.com",
-            picture: "/default-profile.png"
-        };
-
-        let tareas = [
-            {
-                id: 1,
-                tarea: "Revisar diseño",
-                proyecto: "Sitio web",
-                responsable: "María Gómez",
-                fechaInicio: "2023-05-01",
-                fechaFin: "2023-05-03",
-                estado: "Pendiente"
-            },
-            {
-                id: 2,
-                tarea: "Desarrollar API",
-                proyecto: "Aplicación móvil",
-                responsable: "Juan Pérez",
-                fechaInicio: "2023-05-02",
-                fechaFin: "2023-05-10",
-                estado: "En progreso"
-            },
-            {
-                id: 3,
-                tarea: "Pruebas de usuario",
-                proyecto: "Aplicación móvil",
-                responsable: "Ana López",
-                fechaInicio: "2023-05-15",
-                fechaFin: "2023-05-20",
-                estado: "Pendiente"
-            }
-        ];
-
-        let proyectos = ["Sitio web", "Aplicación móvil", "Marketing digital"];
-
-        // Estado de la aplicación
-        let showCalendar = false;
-        let showCompletedTasks = false;
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        let editingEstadoId = null;
-
-        // Elementos del DOM
-        const profilePic = document.getElementById('profile-pic');
-        const userName = document.getElementById('user-name');
-        const userEmail = document.getElementById('user-email');
-        const greeting = document.getElementById('greeting');
-        const subtitle = document.getElementById('subtitle');
-        const tareasHoyCard = document.getElementById('tareas-hoy-card');
-        const tareasProximasCard = document.getElementById('tareas-proximas-card');
-        const toggleCalendarBtn = document.getElementById('toggle-calendar-btn');
-        const toggleCompletedBtn = document.getElementById('toggle-completed-btn');
-        const newTaskBtn = document.getElementById('new-task-btn');
-        const newProjectBtn = document.getElementById('new-project-btn');
-        const toastMessage = document.getElementById('toast-message');
-        const calendarView = document.getElementById('calendar-view');
-        const calendarMonthYear = document.getElementById('calendar-month-year');
-        const calendarGrid = document.getElementById('calendar-grid');
-        const prevMonthBtn = document.getElementById('prev-month-btn');
-        const nextMonthBtn = document.getElementById('next-month-btn');
-        const cardsView = document.getElementById('cards-view');
-        const tareasHoyList = document.getElementById('tareas-hoy-list');
-        const tareasSemanaList = document.getElementById('tareas-semana-list');
-        const tareasMesList = document.getElementById('tareas-mes-list');
-        const verMasHoyBtn = document.getElementById('ver-mas-hoy-btn');
-        const verMasSemanaBtn = document.getElementById('ver-mas-semana-btn');
-        const verMasMesBtn = document.getElementById('ver-mas-mes-btn');
-        const taskTableBody = document.getElementById('task-table-body');
-        const taskModal = document.getElementById('task-modal');
-        const taskName = document.getElementById('task-name');
-        const taskProject = document.getElementById('task-project');
-        const taskResponsible = document.getElementById('task-responsible');
-        const taskStartDate = document.getElementById('task-start-date');
-        const taskEndDateOption = document.getElementById('task-end-date-option');
-        const customEndDateContainer = document.getElementById('custom-end-date-container');
-        const taskCustomEndDate = document.getElementById('task-custom-end-date');
-        const cancelTaskBtn = document.getElementById('cancel-task-btn');
-        const confirmTaskBtn = document.getElementById('confirm-task-btn');
-        const projectModal = document.getElementById('project-modal');
-        const projectName = document.getElementById('project-name');
-        const projectDescription = document.getElementById('project-description');
-        const cancelProjectBtn = document.getElementById('cancel-project-btn');
-        const confirmProjectBtn = document.getElementById('confirm-project-btn');
-        const todayTasksModal = document.getElementById('today-tasks-modal');
-        const todayTasksModalBody = document.getElementById('today-tasks-modal-body');
-        const closeTodayModalBtn = document.getElementById('close-today-modal-btn');
-        const weekTasksModal = document.getElementById('week-tasks-modal');
-        const weekTasksModalBody = document.getElementById('week-tasks-modal-body');
-        const closeWeekModalBtn = document.getElementById('close-week-modal-btn');
-        const monthTasksModal = document.getElementById('month-tasks-modal');
-        const monthTasksModalBody = document.getElementById('month-tasks-modal-body');
-        const closeMonthModalBtn = document.getElementById('close-month-modal-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // Funciones auxiliares
-        function formatDate(date) {
-            return new Date(date).toLocaleDateString('es-ES');
-        }
-
-        function calcularFechaFin(opcion, fechaInicio) {
-            const date = new Date(fechaInicio);
-            
-            switch(opcion) {
-                case 'hoy':
-                    return fechaInicio;
-                case '3dias':
-                    date.setDate(date.getDate() + 3);
-                    break;
-                case '1semana':
-                    date.setDate(date.getDate() + 7);
-                    break;
-                case '1mes':
-                    date.setMonth(date.getMonth() + 1);
-                    break;
-            }
-            
-            return date.toISOString().split('T')[0];
-        }
-
-        function renderCalendar() {
-            // Limpiar el calendario
-            calendarGrid.innerHTML = '';
-            
-            // Añadir días de la semana
-            const weekdays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-            weekdays.forEach(day => {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-weekday';
-                dayElement.textContent = day;
-                calendarGrid.appendChild(dayElement);
-            });
-            
-            // Obtener primer día del mes y día de la semana
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            
-            // Añadir días vacíos al inicio si es necesario
-            for (let i = 0; i < firstDay; i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'calendar-day empty';
-                calendarGrid.appendChild(emptyDay);
-            }
-            
-            // Añadir días del mes
-            const today = new Date();
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                
-                // Verificar si es hoy
-                if (i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
-                    dayElement.classList.add('today');
-                }
-                
-                // Verificar si hay tareas en este día
-                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                const hasTasks = tareas.some(t => t.fechaInicio === dateStr || t.fechaFin === dateStr);
-                
-                if (hasTasks) {
-                    dayElement.classList.add('has-tasks');
-                }
-                
-                dayElement.textContent = i;
-                calendarGrid.appendChild(dayElement);
-            }
-            
-            // Actualizar el título del mes/año
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
-                              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            calendarMonthYear.textContent = `${monthNames[currentMonth].toUpperCase()} ${currentYear}`;
-        }
-
-        function renderTaskTable(tasks) {
-            taskTableBody.innerHTML = '';
-            
-            tasks.forEach(task => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${task.tarea}</td>
-                    <td>${task.proyecto}</td>
-                    <td>${task.responsable}</td>
-                    <td>${formatDate(task.fechaInicio)}</td>
-                    <td>${formatDate(task.fechaFin)}</td>
-                    <td>
-                        ${editingEstadoId === task.id ? 
-                            `<select class="estado-selector" data-task-id="${task.id}">
-                                <option value="Pendiente" ${task.estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                                <option value="En progreso" ${task.estado === 'En progreso' ? 'selected' : ''}>En progreso</option>
-                                <option value="Completado" ${task.estado === 'Completado' ? 'selected' : ''}>Completado</option>
-                            </select>` : 
-                            `<span class="estado estado-${task.estado.toLowerCase().replace(' ', '-')}" data-task-id="${task.id}">
-                                ${task.estado}
-                            </span>`
-                        }
-                    </td>
-                `;
-                
-                taskTableBody.appendChild(row);
-            });
-            
-            // Agregar eventos a los estados
-            document.querySelectorAll('.estado').forEach(el => {
-                el.addEventListener('click', () => {
-                    editingEstadoId = parseInt(el.getAttribute('data-task-id'));
-                    renderTaskTable(tasks);
-                });
-            });
-            
-            // Agregar eventos a los selectores de estado
-            document.querySelectorAll('.estado-selector').forEach(select => {
-                select.addEventListener('change', (e) => {
-                    const taskId = parseInt(e.target.getAttribute('data-task-id'));
-                    const newEstado = e.target.value;
-                    
-                    // Actualizar el estado en los datos
-                    const taskIndex = tareas.findIndex(t => t.id === taskId);
-                    if (taskIndex !== -1) {
-                        tareas[taskIndex].estado = newEstado;
-                    }
-                    
-                    editingEstadoId = null;
-                    renderTaskTable(tasks);
-                    updateSidebarCards();
-                });
-                
-                select.addEventListener('blur', () => {
-                    editingEstadoId = null;
-                    renderTaskTable(tasks);
-                });
-            });
-        }
-
-        function updateSidebarCards() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const tareasHoy = tareas.filter(t => t.fechaInicio === hoy || t.fechaFin === hoy);
-            
-            // Calcular tareas de esta semana
-            const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            const endOfWeek = new Date(today);
-            endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
-            
-            const tareasSemana = tareas.filter(t => {
-                const taskDate = new Date(t.fechaInicio);
-                return taskDate >= startOfWeek && taskDate <= endOfWeek;
-            });
-            
-            // Calcular tareas de este mes
-            const startOfMonth = new Date(currentYear, currentMonth, 1);
-            const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
-            
-            const tareasMes = tareas.filter(t => {
-                const taskDate = new Date(t.fechaInicio);
-                return taskDate >= startOfMonth && taskDate <= endOfMonth;
-            });
-            
-            // Actualizar tarjetas del sidebar
-            tareasHoyCard.textContent = `${tareasHoy.length} ${tareasHoy.length === 1 ? 'tarea' : 'tareas'} para hoy`;
-            tareasProximasCard.textContent = `${tareasSemana.length + tareasMes.length} tareas próximas`;
-            
-            // Actualizar saludo y subtítulo
-            const namePart = userProfile.name !== 'Usuario' ? `, ${userProfile.name.split(' ')[0]}` : '';
-            greeting.textContent = `¡Buenos días${namePart}!`;
-            
-            if (tareasHoy.length === 0) {
-                subtitle.textContent = 'No tienes tareas para hoy';
-            } else {
-                subtitle.textContent = `Tienes ${tareasHoy.length} tarea${tareasHoy.length !== 1 ? 's' : ''} para hoy`;
-            }
-            
-            // Actualizar listas de tareas
-            updateTaskLists(tareasHoy, tareasSemana, tareasMes);
-        }
-
-        function updateTaskLists(tareasHoy, tareasSemana, tareasMes) {
-            // Actualizar lista de tareas de hoy
-            tareasHoyList.innerHTML = '';
-            if (tareasHoy.length === 0) {
-                tareasHoyList.innerHTML = '<li>No hay tareas para hoy</li>';
-            } else {
-                tareasHoy.slice(0, 3).forEach(t => {
-                    const li = document.createElement('li');
-                    li.textContent = t.tarea;
-                    tareasHoyList.appendChild(li);
-                });
-                
-                // Mostrar botón "ver más" si hay más de 3 tareas
-                verMasHoyBtn.style.display = tareasHoy.length > 3 ? 'block' : 'none';
-            }
-            
-            // Actualizar lista de tareas de esta semana
-            tareasSemanaList.innerHTML = '';
-            if (tareasSemana.length === 0) {
-                tareasSemanaList.innerHTML = '<li>No hay tareas esta semana</li>';
-            } else {
-                tareasSemana.slice(0, 3).forEach(t => {
-                    const li = document.createElement('li');
-                    li.textContent = t.tarea;
-                    tareasSemanaList.appendChild(li);
-                });
-                
-                // Mostrar botón "ver más" si hay más de 3 tareas
-                verMasSemanaBtn.style.display = tareasSemana.length > 3 ? 'block' : 'none';
-            }
-            
-            // Actualizar lista de tareas de este mes
-            tareasMesList.innerHTML = '';
-            if (tareasMes.length === 0) {
-                tareasMesList.innerHTML = '<li>No hay tareas este mes</li>';
-            } else {
-                tareasMes.slice(0, 3).forEach(t => {
-                    const li = document.createElement('li');
-                    li.textContent = t.tarea;
-                    tareasMesList.appendChild(li);
-                });
-                
-                // Mostrar botón "ver más" si hay más de 3 tareas
-                verMasMesBtn.style.display = tareasMes.length > 3 ? 'block' : 'none';
-            }
-        }
-
-        function showToast(message) {
-            toastMessage.textContent = message;
-            toastMessage.style.display = 'block';
-            
-            setTimeout(() => {
-                toastMessage.style.display = 'none';
-            }, 3000);
-        }
-
-        // Inicialización
-        function init() {
-            // Configurar perfil de usuario
-            profilePic.src = userProfile.picture;
-            userName.textContent = userProfile.name;
-            userEmail.textContent = userProfile.email;
-            
-            // Configurar fecha actual en el formulario de tarea
-            const today = new Date().toISOString().split('T')[0];
-            taskStartDate.value = today;
-            
-            // Llenar select de proyectos
-            taskProject.innerHTML = '<option value="">Seleccione un proyecto</option>';
-            proyectos.forEach(proyecto => {
-                const option = document.createElement('option');
-                option.value = proyecto;
-                option.textContent = proyecto;
-                taskProject.appendChild(option);
-            });
-            
-            // Renderizar datos iniciales
-            renderCalendar();
-            renderTaskTable(tareas);
-            updateSidebarCards();
-            
-            // Event listeners
-            toggleCalendarBtn.addEventListener('click', () => {
-                showCalendar = !showCalendar;
-                calendarView.style.display = showCalendar ? 'block' : 'none';
-                cardsView.style.display = showCalendar ? 'none' : 'flex';
-                toggleCalendarBtn.textContent = showCalendar ? 'Ocultar Calendario' : 'Mostrar Calendario';
-            });
-            
-            toggleCompletedBtn.addEventListener('click', () => {
-                showCompletedTasks = !showCompletedTasks;
-                toggleCompletedBtn.textContent = showCompletedTasks ? 'Ocultar Completadas' : 'Mostrar Completadas';
-                
-                const filteredTasks = showCompletedTasks ? 
-                    tareas : 
-                    tareas.filter(t => t.estado !== 'Completado');
-                
-                renderTaskTable(filteredTasks);
-            });
-            
-            newTaskBtn.addEventListener('click', () => {
-                taskModal.style.display = 'flex';
-            });
-            
-            newProjectBtn.addEventListener('click', () => {
-                projectModal.style.display = 'flex';
-            });
-            
-            cancelTaskBtn.addEventListener('click', () => {
-                taskModal.style.display = 'none';
-            });
-            
-            confirmTaskBtn.addEventListener('click', () => {
-                // Validar formulario
-                if (!taskName.value || !taskProject.value || !taskResponsible.value || !taskStartDate.value || !taskEndDateOption.value) {
-                    showToast('Por favor complete todos los campos obligatorios');
-                    return;
-                }
-                
-                // Crear nueva tarea
-                const newTask = {
-                    id: tareas.length + 1,
-                    tarea: taskName.value,
-                    proyecto: taskProject.value,
-                    responsable: taskResponsible.value,
-                    fechaInicio: taskStartDate.value,
-                    fechaFin: taskEndDateOption.value === 'personalizado' ? taskCustomEndDate.value : 
-                              calcularFechaFin(taskEndDateOption.value, taskStartDate.value),
-                    estado: "Pendiente"
-                };
-                
-                // Añadir a la lista de tareas
-                tareas.push(newTask);
-                
-                // Limpiar formulario
-                taskName.value = '';
-                taskProject.value = '';
-                taskResponsible.value = '';
-                taskStartDate.value = today;
-                taskEndDateOption.value = '';
-                taskCustomEndDate.value = '';
-                customEndDateContainer.style.display = 'none';
-                
-                // Cerrar modal
-                taskModal.style.display = 'none';
-                
-                // Actualizar UI
-                renderTaskTable(tareas);
-                updateSidebarCards();
-                renderCalendar();
-                
-                showToast('Tarea agregada correctamente');
-            });
-            
-            cancelProjectBtn.addEventListener('click', () => {
-                projectModal.style.display = 'none';
-            });
-            
-            confirmProjectBtn.addEventListener('click', () => {
-                // Validar formulario
-                if (!projectName.value || !projectDescription.value) {
-                    showToast('Por favor complete todos los campos obligatorios');
-                    return;
-                }
-                
-                // Añadir nuevo proyecto
-                proyectos.push(projectName.value);
-                
-                // Limpiar formulario
-                projectName.value = '';
-                projectDescription.value = '';
-                
-                // Cerrar modal
-                projectModal.style.display = 'none';
-                
-                // Actualizar select de proyectos en el modal de tareas
-                taskProject.innerHTML = '<option value="">Seleccione un proyecto</option>';
-                proyectos.forEach(proyecto => {
-                    const option = document.createElement('option');
-                    option.value = proyecto;
-                    option.textContent = proyecto;
-                    taskProject.appendChild(option);
-                });
-                
-                showToast('Proyecto agregado correctamente');
-            });
-            
-            taskEndDateOption.addEventListener('change', (e) => {
-                if (e.target.value === 'personalizado') {
-                    customEndDateContainer.style.display = 'block';
-                    taskCustomEndDate.min = taskStartDate.value;
-                } else {
-                    customEndDateContainer.style.display = 'none';
-                }
-            });
-            
-            prevMonthBtn.addEventListener('click', () => {
-                currentMonth--;
-                if (currentMonth < 0) {
-                    currentMonth = 11;
-                    currentYear--;
-                }
-                renderCalendar();
-            });
-            
-            nextMonthBtn.addEventListener('click', () => {
-                currentMonth++;
-                if (currentMonth > 11) {
-                    currentMonth = 0;
-                    currentYear++;
-                }
-                renderCalendar();
-            });
-            
-            verMasHoyBtn.addEventListener('click', () => {
-                const hoy = new Date().toISOString().split('T')[0];
-                const tareasHoy = tareas.filter(t => t.fechaInicio === hoy || t.fechaFin === hoy);
-                
-                todayTasksModalBody.innerHTML = '';
-                tareasHoy.forEach(t => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${t.tarea}</td>
-                        <td>${t.proyecto}</td>
-                        <td>${t.responsable}</td>
-                        <td><span class="estado estado-${t.estado.toLowerCase().replace(' ', '-')}">${t.estado}</span></td>
-                    `;
-                    todayTasksModalBody.appendChild(row);
-                });
-                
-                todayTasksModal.style.display = 'flex';
-            });
-            
-            verMasSemanaBtn.addEventListener('click', () => {
-                const today = new Date();
-                const startOfWeek = new Date(today);
-                startOfWeek.setDate(today.getDate() - today.getDay());
-                const endOfWeek = new Date(today);
-                endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
-                
-                const tareasSemana = tareas.filter(t => {
-                    const taskDate = new Date(t.fechaInicio);
-                    return taskDate >= startOfWeek && taskDate <= endOfWeek;
-                });
-                
-                weekTasksModalBody.innerHTML = '';
-                tareasSemana.forEach(t => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${t.tarea}</td>
-                        <td>${t.proyecto}</td>
-                        <td>${t.responsable}</td>
-                        <td><span class="estado estado-${t.estado.toLowerCase().replace(' ', '-')}">${t.estado}</span></td>
-                    `;
-                    weekTasksModalBody.appendChild(row);
-                });
-                
-                weekTasksModal.style.display = 'flex';
-            });
-            
-            verMasMesBtn.addEventListener('click', () => {
-                const startOfMonth = new Date(currentYear, currentMonth, 1);
-                const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
-                
-                const tareasMes = tareas.filter(t => {
-                    const taskDate = new Date(t.fechaInicio);
-                    return taskDate >= startOfMonth && taskDate <= endOfMonth;
-                });
-                
-                monthTasksModalBody.innerHTML = '';
-                tareasMes.forEach(t => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${t.tarea}</td>
-                        <td>${t.proyecto}</td>
-                        <td>${t.responsable}</td>
-                        <td><span class="estado estado-${t.estado.toLowerCase().replace(' ', '-')}">${t.estado}</span></td>
-                    `;
-                    monthTasksModalBody.appendChild(row);
-                });
-                
-                monthTasksModal.style.display = 'flex';
-            });
-            
-            closeTodayModalBtn.addEventListener('click', () => {
-                todayTasksModal.style.display = 'none';
-            });
-            
-            closeWeekModalBtn.addEventListener('click', () => {
-                weekTasksModal.style.display = 'none';
-            });
-            
-            closeMonthModalBtn.addEventListener('click', () => {
-                monthTasksModal.style.display = 'none';
-            });
-            
-            logoutBtn.addEventListener('click', () => {
-                // Simular cierre de sesión
-                localStorage.removeItem("token");
-                window.location.href = "/login";
-            });
-            
-            // Manejar clics fuera de los modales para cerrarlos
-            window.addEventListener('click', (e) => {
-                if (e.target === taskModal) {
-                    taskModal.style.display = 'none';
-                }
-                if (e.target === projectModal) {
-                    projectModal.style.display = 'none';
-                }
-                if (e.target === todayTasksModal) {
-                    todayTasksModal.style.display = 'none';
-                }
-                if (e.target === weekTasksModal) {
-                    weekTasksModal.style.display = 'none';
-                }
-                if (e.target === monthTasksModal) {
-                    monthTasksModal.style.display = 'none';
-                }
-            });
-        }
-
-        // Iniciar la aplicación cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
