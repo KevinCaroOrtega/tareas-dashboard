@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-function App() {
-  const [tasks, setTasks] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
+function App() {
+  // Estados originales de tareas-dashboard (matriz)
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [newTask, setNewTask] = useState({
     tarea: '',
     proyecto: '',
@@ -13,205 +14,112 @@ function App() {
     fechaInicio: '',
     fechaFin: '',
     fechaEjecucion: '',
-    estado: 'Pendiente',
+    estado: 'Pendiente'
   });
 
-  const [newProject, setNewProject] = useState({
-    nombre: '',
-    descripcion: '',
-  });
+  // Estados adicionales del dashboard (diseño/funcionalidades)
+  const [showModal, setShowModal] = useState(false);
+  const [showModalProyecto, setShowModalProyecto] = useState(false);
+  const [proyectos, setProyectos] = useState([]);
+  const [error, setError] = useState(null);
 
-  // Obtener tareas y proyectos al iniciar
-  useEffect(() => {
-    fetch('https://taula.onrender.com/api/tareas')
-      .then((res) => res.json())
-      .then((data) => {
-        setTasks(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error al cargar tareas:', err);
-        setLoading(false);
+  // Cargar tareas desde Google Sheets (lógica original de tareas-dashboard)
+  const fetchTasks = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/tasks`);
+      const data = await response.json();
+      setTasks(data.data || []);
+    } catch (err) {
+      setError('Error al cargar tareas');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Agregar nueva tarea (adaptado para usar el estado newTask de tareas-dashboard)
+  const handleAddTask = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTask)
       });
+      if (!response.ok) throw new Error('Error al guardar');
+      await fetchTasks();
+      setShowModal(false);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-    fetch('https://taula.onrender.com/api/projects')
-      .then((res) => res.json())
-      .then((data) => setProjects(data))
-      .catch((err) => console.error('Error al cargar proyectos:', err));
+  // Efecto para cargar datos iniciales
+  useEffect(() => {
+    fetchTasks();
+    // Simular carga de proyectos (del dashboard)
+    setProyectos(['Proyecto A', 'Proyecto B']);
   }, []);
 
-  const handleTaskChange = (e) => {
-    const { name, value } = e.target;
-    setNewTask({ ...newTask, [name]: value });
-  };
-
-  const handleProjectChange = (e) => {
-    const { name, value } = e.target;
-    setNewProject({ ...newProject, [name]: value });
-  };
-
-  const handleAddTask = async () => {
-    const { tarea, proyecto, responsable, fechaInicio, fechaFin } = newTask;
-    if (!tarea || !proyecto || !responsable || !fechaInicio || !fechaFin) {
-      alert('Completa todos los campos obligatorios de la tarea.');
-      return;
-    }
-
-    try {
-      const res = await fetch('https://taula.onrender.com/api/tareas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTask),
-      });
-
-      if (!res.ok) throw new Error('Error al agregar tarea');
-      setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
-      setNewTask({
-        tarea: '',
-        proyecto: '',
-        responsable: '',
-        fechaInicio: '',
-        fechaFin: '',
-        fechaEjecucion: '',
-        estado: 'Pendiente',
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleAddProject = async () => {
-    const { nombre, descripcion } = newProject;
-    if (!nombre || !descripcion) {
-      alert('Completa todos los campos del proyecto.');
-      return;
-    }
-
-    try {
-      const res = await fetch('https://taula.onrender.com/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProject),
-      });
-
-      if (!res.ok) throw new Error('Error al agregar proyecto');
-      setProjects([...projects, { ...newProject, id: projects.length + 1 }]);
-      setNewProject({ nombre: '', descripcion: '' });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // Componentes visuales del dashboard (simplificados)
+  const TaskModal = () => (
+    <div className="modal" onClick={() => setShowModal(false)}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2>Nueva Tarea</h2>
+        <input
+          type="text"
+          placeholder="Nombre de la tarea"
+          value={newTask.tarea}
+          onChange={(e) => setNewTask({...newTask, tarea: e.target.value})}
+        />
+        {/* Resto de campos del formulario */}
+        <button onClick={handleAddTask}>Guardar</button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="App">
-      <h1>Dashboard de Tareas</h1>
-
-      <div className="dashboard">
-        <h2>Resumen del Proyecto</h2>
-        <p>Total de tareas: {tasks.length}</p>
-        <p>Total de proyectos: {projects.length}</p>
+    <div className="dashboard-container">
+      {/* Barra lateral del dashboard */}
+      <div className="sidebar">
+        <div className="profile-header">
+          <h2>Usuario</h2>
+          <button className="btn green" onClick={() => setShowModal(true)}>
+            + Nueva tarea
+          </button>
+        </div>
       </div>
 
-      <div className="section">
-        <h2>Proyectos</h2>
-        {projects.length === 0 ? (
-          <p>No hay proyectos registrados.</p>
-        ) : (
-          <ul>
-            {projects.map((proj) => (
-              <li key={proj.id} className="project-item">
-                <strong>{proj.nombre}</strong> - {proj.descripcion}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <h3>Agregar nuevo proyecto</h3>
-        <input
-          type="text"
-          name="nombre"
-          value={newProject.nombre}
-          placeholder="Nombre del proyecto"
-          onChange={handleProjectChange}
-        />
-        <input
-          type="text"
-          name="descripcion"
-          value={newProject.descripcion}
-          placeholder="Descripción"
-          onChange={handleProjectChange}
-        />
-        <button onClick={handleAddProject}>Agregar proyecto</button>
-      </div>
-
-      <div className="section">
-        <h2>Tareas</h2>
+      {/* Contenido principal */}
+      <div className="main-content">
         {loading ? (
-          <p>Cargando tareas...</p>
-        ) : tasks.length === 0 ? (
-          <p>No hay tareas disponibles.</p>
+          <p>Cargando...</p>
         ) : (
-          <ul>
-            {tasks.map((task) => (
-              <li key={task.id} className="task-item">
-                <h3>{task.tarea}</h3>
-                <p><strong>Proyecto:</strong> {task.proyecto}</p>
-                <p><strong>Responsable:</strong> {task.responsable}</p>
-                <p><strong>Inicio:</strong> {task.fechaInicio}</p>
-                <p><strong>Fin:</strong> {task.fechaFin}</p>
-                <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
-                <p><strong>Estado:</strong> {task.estado}</p>
-              </li>
-            ))}
-          </ul>
+          <>
+            {/* Tabla de tareas (estilo dashboard) */}
+            <table className="task-table">
+              <thead>
+                <tr>
+                  <th>Tarea</th>
+                  <th>Proyecto</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tasks.map((task) => (
+                  <tr key={task.id}>
+                    <td>{task.tarea}</td>
+                    <td>{task.proyecto}</td>
+                    <td>{task.estado}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
 
-        <h3>Agregar nueva tarea</h3>
-        <input
-          type="text"
-          name="tarea"
-          value={newTask.tarea}
-          placeholder="Nombre de la tarea"
-          onChange={handleTaskChange}
-        />
-        <input
-          type="text"
-          name="proyecto"
-          value={newTask.proyecto}
-          placeholder="Proyecto"
-          onChange={handleTaskChange}
-        />
-        <input
-          type="text"
-          name="responsable"
-          value={newTask.responsable}
-          placeholder="Responsable"
-          onChange={handleTaskChange}
-        />
-        <input
-          type="date"
-          name="fechaInicio"
-          value={newTask.fechaInicio}
-          onChange={handleTaskChange}
-        />
-        <input
-          type="date"
-          name="fechaFin"
-          value={newTask.fechaFin}
-          onChange={handleTaskChange}
-        />
-        <input
-          type="date"
-          name="fechaEjecucion"
-          value={newTask.fechaEjecucion}
-          onChange={handleTaskChange}
-        />
-        <select name="estado" value={newTask.estado} onChange={handleTaskChange}>
-          <option value="Pendiente">Pendiente</option>
-          <option value="En progreso">En progreso</option>
-          <option value="Completada">Completada</option>
-        </select>
-        <button onClick={handleAddTask}>Agregar tarea</button>
+        {/* Modales */}
+        {showModal && <TaskModal />}
       </div>
     </div>
   );
