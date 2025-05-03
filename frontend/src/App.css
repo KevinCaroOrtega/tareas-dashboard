@@ -1,59 +1,148 @@
-/* Variables (del dashboard) */
+/* Variables */
 :root {
-  --color-primary: #7b61ff;
-  --color-green: #4caf50;
+  --color-primary: #2c3e50;
+  --color-green: #2ecc71;
+  --color-blue: #3498db;
+  --color-yellow: #f39c12;
+  --color-red: #e74c3c;
 }
 
-/* Estructura principal (dashboard) */
+/* Estructura Principal */
 .dashboard-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f4f6f8;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .sidebar {
   width: 300px;
-  background-color: #f0f2f5;
+  background: var(--color-primary);
+  color: white;
   padding: 20px;
-  border-right: 1px solid #e0e0e0;
 }
 
 .main-content {
   flex: 1;
-  padding: 40px;
-  background-color: #f9f9f9;
+  padding: 20px;
+  background: #f5f7fa;
 }
 
-/* Tabla (estilo dashboard) */
+/* Sidebar */
+.profile-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.sidebar-card {
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.sidebar-card:hover {
+  transform: translateY(-3px);
+}
+
+.card-green {
+  background: var(--color-green);
+}
+
+.card-blue {
+  background: var(--color-blue);
+}
+
+.card-yellow {
+  background: var(--color-yellow);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.greeting {
+  font-size: 24px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #666;
+}
+
+/* Botones */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.btn.green {
+  background: var(--color-green);
+  color: white;
+}
+
+.btn.green:hover {
+  background: #27ae60;
+}
+
+/* Tabla */
 .task-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.task-table th, .task-table td {
-  padding: 12px 16px;
+.task-table th {
+  background: var(--color-blue);
+  color: white;
+  padding: 12px;
   text-align: left;
+}
+
+.task-table td {
+  padding: 10px 12px;
   border-bottom: 1px solid #eee;
 }
 
-/* Botones (dashboard) */
-.btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn.green {
-  background-color: var(--color-green);
+/* Estados */
+.estado {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
   color: white;
 }
 
-/* Modal (dashboard) */
+.estado-pendiente {
+  background: var(--color-yellow);
+}
+
+.estado-en-progreso {
+  background: var(--color-blue);
+}
+
+.estado-completado {
+  background: var(--color-green);
+}
+
+/* Modal */
 .modal {
   position: fixed;
   top: 0;
@@ -70,7 +159,102 @@
 .modal-content {
   background: white;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 8px;
   width: 90%;
   max-width: 500px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.input-container label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.input-container input,
+.input-container select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  background: var(--color-red);
+  color: white;
+}
+
+.btn-confirm {
+  background: var(--color-green);
+  color: white;
+  margin-left: 10px;
+}
+
+/* Calendario */
+.calendar-view {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-weight: bold;
+  padding: 5px;
+}
+
+.calendar-day {
+  height: 80px;
+  border: 1px solid #ddd;
+  padding: 5px;
+  overflow: auto;
+}
+
+.calendar-day.today {
+  background: #e3f2fd;
+}
+
+/* Toast */
+.toast-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--color-red);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  animation: slideIn 0.3s, fadeOut 0.5s 2.5s forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
