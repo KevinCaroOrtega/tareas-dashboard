@@ -1,182 +1,20 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Tareas</title>
-    <!-- Estilos previos se mantienen igual -->
-</head>
-<body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-
-    <!-- Contenedor principal -->
-    <div id="app">
-        <!-- ... (todo el contenido previo del dashboard se mantiene igual) ... -->
-
-        <!-- Modal Nueva Tarea - Versión actualizada -->
-        <div class="modal" id="task-modal" style="display: none;">
-            <div class="modal-content">
-                <h2>Nueva tarea</h2>
-                <form id="task-form">
-                    <div class="input-container">
-                        <label>Nombre de la tarea *</label>
-                        <input type="text" id="task-name" name="tarea" placeholder="Ej: Revisar diseño" required>
-                    </div>
-                    
-                    <div class="input-container">
-                        <label>Proyecto *</label>
-                        <select id="task-project" name="proyecto" required>
-                            <option value="">Seleccione un proyecto</option>
-                            <!-- Opciones se llenarán dinámicamente -->
-                        </select>
-                    </div>
-                    
-                    <div class="input-container">
-                        <label>Responsable *</label>
-                        <input type="text" id="task-responsible" name="responsable" placeholder="Ej: María Gómez" required>
-                    </div>
-
-                    <div class="input-container">
-                        <label>Fecha de inicio *</label>
-                        <input type="date" id="task-start-date" name="fechaInicio" required>
-                    </div>
-
-                    <div class="input-container">
-                        <label>Fecha de ejecución</label>
-                        <input type="date" id="task-execution-date" name="fechaEjecucion">
-                    </div>
-
-                    <div class="input-container">
-                        <label>Fecha fin *</label>
-                        <select id="task-end-date-option" name="fechaFinOption" required>
-                            <option value="">Seleccione una opción</option>
-                            <option value="hoy">Hoy</option>
-                            <option value="3dias">3 días</option>
-                            <option value="1semana">1 semana</option>
-                            <option value="1mes">1 mes</option>
-                            <option value="personalizado">Personalizado</option>
-                        </select>
-                    </div>
-
-                    <div class="input-container" id="custom-end-date-container" style="display: none;">
-                        <label>Fecha fin personalizada *</label>
-                        <input type="date" id="task-custom-end-date" name="fechaFin">
-                    </div>
-                    
-                    <div class="input-container">
-                        <label>Estado *</label>
-                        <select id="task-state" name="estado" required>
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="En progreso">En progreso</option>
-                            <option value="Completado">Completado</option>
-                        </select>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn-cancel" id="cancel-task-btn">Cancelar</button>
-                        <button type="submit" class="btn-confirm" id="confirm-task-btn">Agregar tarea</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- ... (resto de modales se mantienen igual) ... -->
-    </div>
-
-    <script>
-        // Script actualizado para manejar correctamente las fechas
-        document.addEventListener('DOMContentLoaded', function() {
-            // Manejar cambios en la selección de fecha fin
-            document.getElementById('task-end-date-option').addEventListener('change', function(e) {
-                const endDateOption = e.target.value;
-                const customContainer = document.getElementById('custom-end-date-container');
-                const startDate = document.getElementById('task-start-date').value;
-                
-                if (endDateOption === 'personalizado') {
-                    customContainer.style.display = 'block';
-                } else {
-                    customContainer.style.display = 'none';
-                    if (startDate && endDateOption) {
-                        const calculatedDate = calcularFechaFin(endDateOption, startDate);
-                        document.getElementById('task-custom-end-date').value = calculatedDate;
-                    }
-                }
-            });
-
-            // Actualizar fecha fin cuando cambia la fecha de inicio
-            document.getElementById('task-start-date').addEventListener('change', function(e) {
-                const endDateOption = document.getElementById('task-end-date-option').value;
-                if (endDateOption && endDateOption !== 'personalizado') {
-                    const calculatedDate = calcularFechaFin(endDateOption, e.target.value);
-                    document.getElementById('task-custom-end-date').value = calculatedDate;
-                }
-            });
-
-            // Manejar envío del formulario
-            document.getElementById('task-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Construir objeto de datos alineado con el backend
-                const formData = new FormData(e.target);
-                const taskData = {
-                    tarea: formData.get('tarea'),
-                    proyecto: formData.get('proyecto'),
-                    responsable: formData.get('responsable'),
-                    fechaInicio: formData.get('fechaInicio'),
-                    fechaFin: formData.get('fechaFin') || calcularFechaFin(
-                        formData.get('fechaFinOption'),
-                        formData.get('fechaInicio')
-                    ),
-                    fechaEjecucion: formData.get('fechaEjecucion') || null,
-                    estado: formData.get('estado')
-                };
-
-                // Enviar al backend
-                fetch('/api/tareas', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(taskData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Cerrar modal y mostrar feedback
-                    document.getElementById('task-modal').style.display = 'none';
-                    showToast('Tarea agregada correctamente');
-                    // Aquí deberías actualizar la UI o recargar los datos
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('Error al agregar la tarea');
-                });
-            });
-
-            // Función para calcular fechas (igual que antes)
-            function calcularFechaFin(opcion, fechaInicio) {
-                const date = new Date(fechaInicio);
-                
-                switch(opcion) {
-                    case 'hoy': return fechaInicio;
-                    case '3dias': date.setDate(date.getDate() + 3); break;
-                    case '1semana': date.setDate(date.getDate() + 7); break;
-                    case '1mes': date.setMonth(date.getMonth() + 1); break;
-                }
-                
-                return date.toISOString().split('T')[0];
-            }
-
-            // Función para mostrar notificaciones
-            function showToast(message) {
-                const toast = document.getElementById('toast-message');
-                toast.textContent = message;
-                toast.style.display = 'block';
-                
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 3000);
-            }
-        });
-    </script>
-</body>
+  </body>
 </html>
