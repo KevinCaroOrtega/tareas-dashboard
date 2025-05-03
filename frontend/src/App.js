@@ -14,38 +14,35 @@ function App() {
     estado: 'Pendiente',
   });
 
-  const [projects, setProjects] = useState([]);
-  const [newProject, setNewProject] = useState({ nombre: '', descripcion: '' });
-
-  // Cargar tareas y proyectos
+  // Cargar tareas al iniciar
   useEffect(() => {
-    // Cargar tareas
     fetch('https://taula.onrender.com/api/tareas')
       .then((response) => {
-        if (!response.ok) throw new Error('Error en la respuesta de tareas');
+        if (!response.ok) {
+          throw new Error('Error en la respuesta de la API');
+        }
         return response.json();
       })
-      .then((data) => setTasks(data))
-      .catch((error) => console.error('Error al obtener las tareas:', error))
-      .finally(() => setLoading(false));
-
-    // Cargar proyectos
-    fetch('https://taula.onrender.com/api/projects')
-      .then((response) => {
-        if (!response.ok) throw new Error('Error en la respuesta de proyectos');
-        return response.json();
+      .then((data) => {
+        setTasks(data);
+        setLoading(false);
       })
-      .then((data) => setProjects(data))
-      .catch((error) => console.error('Error al obtener los proyectos:', error));
+      .catch((error) => {
+        console.error('Error al obtener las tareas:', error);
+        setLoading(false);
+      });
   }, []);
 
-  // Manejador inputs tareas
-  const handleChangeTask = (e) => {
+  // Manejador de cambios de inputs
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewTask({ ...newTask, [name]: value });
+    setNewTask({
+      ...newTask,
+      [name]: value,
+    });
   };
 
-  // Agregar nueva tarea
+  // Agregar una nueva tarea
   const handleAddTask = async () => {
     const { tarea, proyecto, responsable, fechaInicio, fechaFin } = newTask;
 
@@ -57,13 +54,18 @@ function App() {
     try {
       const response = await fetch('https://taula.onrender.com/api/tareas', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(newTask),
       });
 
-      if (!response.ok) throw new Error('Error al agregar tarea');
+      if (!response.ok) {
+        throw new Error('Error al agregar tarea');
+      }
 
       const data = await response.json();
+
       setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
       setNewTask({
         tarea: '',
@@ -79,40 +81,14 @@ function App() {
     }
   };
 
-  // Manejador inputs proyectos
-  const handleChangeProject = (e) => {
-    const { name, value } = e.target;
-    setNewProject({ ...newProject, [name]: value });
-  };
-
-  // Agregar nuevo proyecto
-  const handleAddProject = async () => {
-    const { nombre, descripcion } = newProject;
-
-    if (!nombre || !descripcion) {
-      alert('Por favor, completa ambos campos del proyecto');
-      return;
-    }
-
-    try {
-      const response = await fetch('https://taula.onrender.com/api/proyectos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProject),
-      });
-
-      if (!response.ok) throw new Error('Error al agregar proyecto');
-
-      setProjects([...projects, { ...newProject, id: projects.length + 1 }]);
-      setNewProject({ nombre: '', descripcion: '' });
-    } catch (error) {
-      console.error('Error al agregar el proyecto:', error);
-    }
-  };
-
   return (
     <div className="App">
       <h1>Dashboard de Tareas</h1>
+
+      <div className="dashboard">
+        <h2>Resumen del Proyecto</h2>
+        {/* Aquí puedes añadir gráficos, estadísticas, etc. */}
+      </div>
 
       {loading ? (
         <p>Cargando datos...</p>
@@ -136,36 +112,18 @@ function App() {
 
       <div>
         <h2>Agregar nueva tarea</h2>
-        <input type="text" name="tarea" value={newTask.tarea} placeholder="Nombre de la tarea" onChange={handleChangeTask} />
-        <input type="text" name="proyecto" value={newTask.proyecto} placeholder="Proyecto" onChange={handleChangeTask} />
-        <input type="text" name="responsable" value={newTask.responsable} placeholder="Responsable" onChange={handleChangeTask} />
-        <input type="date" name="fechaInicio" value={newTask.fechaInicio} onChange={handleChangeTask} />
-        <input type="date" name="fechaFin" value={newTask.fechaFin} onChange={handleChangeTask} />
-        <input type="date" name="fechaEjecucion" value={newTask.fechaEjecucion} onChange={handleChangeTask} />
-        <select name="estado" value={newTask.estado} onChange={handleChangeTask}>
+        <input type="text" name="tarea" value={newTask.tarea} placeholder="Nombre de la tarea" onChange={handleChange} />
+        <input type="text" name="proyecto" value={newTask.proyecto} placeholder="Proyecto" onChange={handleChange} />
+        <input type="text" name="responsable" value={newTask.responsable} placeholder="Responsable" onChange={handleChange} />
+        <input type="date" name="fechaInicio" value={newTask.fechaInicio} onChange={handleChange} />
+        <input type="date" name="fechaFin" value={newTask.fechaFin} onChange={handleChange} />
+        <input type="date" name="fechaEjecucion" value={newTask.fechaEjecucion} onChange={handleChange} />
+        <select name="estado" value={newTask.estado} onChange={handleChange}>
           <option value="Pendiente">Pendiente</option>
           <option value="En progreso">En progreso</option>
           <option value="Completada">Completada</option>
         </select>
         <button onClick={handleAddTask}>Agregar tarea</button>
-      </div>
-
-      <hr />
-
-      <div>
-        <h2>Proyectos</h2>
-        <ul>
-          {projects.map((p) => (
-            <li key={p.id}>
-              <strong>{p.nombre}</strong>: {p.descripcion}
-            </li>
-          ))}
-        </ul>
-
-        <h3>Agregar nuevo proyecto</h3>
-        <input type="text" name="nombre" placeholder="Nombre del proyecto" value={newProject.nombre} onChange={handleChangeProject} />
-        <input type="text" name="descripcion" placeholder="Descripción" value={newProject.descripcion} onChange={handleChangeProject} />
-        <button onClick={handleAddProject}>Agregar proyecto</button>
       </div>
     </div>
   );
