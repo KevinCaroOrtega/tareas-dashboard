@@ -83,3 +83,31 @@ app.post('/api/tareas', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor backend corriendo en el puerto ${PORT}`);
 });
+
+// Endpoint para agregar un proyecto
+app.post('/api/proyectos', async (req, res) => {
+  try {
+    const { nombre, descripcion } = req.body;
+
+    if (!nombre || !descripcion) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
+
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
+      range: 'Proyectos!A2:B',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [[nombre, descripcion]],
+      },
+    });
+
+    res.status(201).json({ message: 'Proyecto agregado con éxito' });
+  } catch (error) {
+    console.error('Error al agregar el proyecto:', error);
+    res.status(500).json({ error: 'Error al agregar el proyecto' });
+  }
+});
