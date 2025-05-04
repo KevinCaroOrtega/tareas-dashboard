@@ -1,57 +1,37 @@
-.App {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos personalizados */
+body {
+  @apply bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100;
 }
 
-h1 {
-  text-align: center;
+.header {
+  @apply p-4 text-white bg-blue-500;
 }
 
 .dashboard {
-  padding: 20px;
-  background-color: #f5f5f5;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  text-align: center;
+  @apply p-6 bg-gray-100 rounded-lg shadow-md;
 }
 
-.section {
-  margin-bottom: 30px;
+.kanban-board {
+  @apply flex space-x-4;
 }
 
-.task-item,
-.project-item {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  background-color: #fafafa;
+.kanban-column {
+  @apply p-4 bg-gray-200 rounded-lg;
 }
 
-input,
-select {
-  display: block;
-  margin-bottom: 10px;
-  padding: 8px;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+.task-item, .project-item {
+  @apply p-4 bg-gray-200 rounded-lg mb-3;
 }
 
 button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 10px;
+  @apply p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700;
 }
 
-button:hover {
-  background-color: #0056b3;
+button:focus {
+  outline: none;
+  border: 2px solid #0056b3;
 }

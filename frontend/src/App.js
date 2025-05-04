@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Sortable from 'sortablejs';
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -21,8 +22,8 @@ function App() {
     descripcion: '',
   });
 
-  // Obtener tareas y proyectos al iniciar
   useEffect(() => {
+    // Obtener tareas y proyectos al iniciar
     fetch('https://taula.onrender.com/api/tareas')
       .then((res) => res.json())
       .then((data) => {
@@ -39,6 +40,17 @@ function App() {
       .then((data) => setProjects(data))
       .catch((err) => console.error('Error al cargar proyectos:', err));
   }, []);
+
+  useEffect(() => {
+    // Inicializar SortableJS para el tablero Kanban
+    document.querySelectorAll('.kanban-column').forEach((column) => {
+      new Sortable(column, {
+        group: 'kanban',
+        animation: 150,
+        ghostClass: 'bg-yellow-100',
+      });
+    });
+  }, [tasks]); // Ejecutamos SortableJS cuando las tareas se cargan o actualizan
 
   const handleTaskChange = (e) => {
     const { name, value } = e.target;
@@ -104,9 +116,11 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Dashboard de Tareas</h1>
+      <header className="header bg-blue-500 text-white p-4 text-center">
+        <h1>Dashboard de Tareas</h1>
+      </header>
 
-      <div className="dashboard">
+      <div className="dashboard p-6 bg-gray-100 rounded-lg shadow-md">
         <h2>Resumen del Proyecto</h2>
         <p>Total de tareas: {tasks.length}</p>
         <p>Total de proyectos: {projects.length}</p>
@@ -119,7 +133,7 @@ function App() {
         ) : (
           <ul>
             {projects.map((proj) => (
-              <li key={proj.id} className="project-item">
+              <li key={proj.id} className="project-item p-4 bg-gray-200 rounded-lg mb-3">
                 <strong>{proj.nombre}</strong> - {proj.descripcion}
               </li>
             ))}
@@ -151,19 +165,44 @@ function App() {
         ) : tasks.length === 0 ? (
           <p>No hay tareas disponibles.</p>
         ) : (
-          <ul>
-            {tasks.map((task) => (
-              <li key={task.id} className="task-item">
-                <h3>{task.tarea}</h3>
-                <p><strong>Proyecto:</strong> {task.proyecto}</p>
-                <p><strong>Responsable:</strong> {task.responsable}</p>
-                <p><strong>Inicio:</strong> {task.fechaInicio}</p>
-                <p><strong>Fin:</strong> {task.fechaFin}</p>
-                <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
-                <p><strong>Estado:</strong> {task.estado}</p>
-              </li>
-            ))}
-          </ul>
+          <div className="kanban-board flex space-x-4">
+            <div className="kanban-column bg-blue-100 p-4 rounded-lg w-1/4">
+              <h3>Pendiente</h3>
+              <ul>
+                {tasks.filter(task => task.estado === 'Pendiente').map((task) => (
+                  <li key={task.id} className="task-item p-4 bg-gray-200 rounded-lg mb-3">
+                    <h3>{task.tarea}</h3>
+                    <p><strong>Proyecto:</strong> {task.proyecto}</p>
+                    <p><strong>Responsable:</strong> {task.responsable}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="kanban-column bg-yellow-100 p-4 rounded-lg w-1/4">
+              <h3>En progreso</h3>
+              <ul>
+                {tasks.filter(task => task.estado === 'En progreso').map((task) => (
+                  <li key={task.id} className="task-item p-4 bg-gray-200 rounded-lg mb-3">
+                    <h3>{task.tarea}</h3>
+                    <p><strong>Proyecto:</strong> {task.proyecto}</p>
+                    <p><strong>Responsable:</strong> {task.responsable}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="kanban-column bg-green-100 p-4 rounded-lg w-1/4">
+              <h3>Completadas</h3>
+              <ul>
+                {tasks.filter(task => task.estado === 'Completada').map((task) => (
+                  <li key={task.id} className="task-item p-4 bg-gray-200 rounded-lg mb-3">
+                    <h3>{task.tarea}</h3>
+                    <p><strong>Proyecto:</strong> {task.proyecto}</p>
+                    <p><strong>Responsable:</strong> {task.responsable}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         )}
 
         <h3>Agregar nueva tarea</h3>
