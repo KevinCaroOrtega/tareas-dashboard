@@ -1766,6 +1766,50 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
+"@tailwindcss/node@4.1.5":
+  version "4.1.5"
+  resolved "https://registry.npmjs.org/@tailwindcss/node/-/node-4.1.5.tgz"
+  integrity sha512-CBhSWo0vLnWhXIvpD0qsPephiaUYfHUX3U9anwDaHZAeuGpTiB3XmsxPAN6qX7bFhipyGBqOa1QYQVVhkOUGxg==
+  dependencies:
+    enhanced-resolve "^5.18.1"
+    jiti "^2.4.2"
+    lightningcss "1.29.2"
+    tailwindcss "4.1.5"
+
+"@tailwindcss/oxide-win32-x64-msvc@4.1.5":
+  version "4.1.5"
+  resolved "https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.1.5.tgz"
+  integrity sha512-WiR4dtyrFdbb+ov0LK+7XsFOsG+0xs0PKZKkt41KDn9jYpO7baE3bXiudPVkTqUEwNfiglCygQHl2jklvSBi7Q==
+
+"@tailwindcss/oxide@4.1.5":
+  version "4.1.5"
+  resolved "https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.1.5.tgz"
+  integrity sha512-1n4br1znquEvyW/QuqMKQZlBen+jxAbvyduU87RS8R3tUSvByAkcaMTkJepNIrTlYhD+U25K4iiCIxE6BGdRYA==
+  optionalDependencies:
+    "@tailwindcss/oxide-android-arm64" "4.1.5"
+    "@tailwindcss/oxide-darwin-arm64" "4.1.5"
+    "@tailwindcss/oxide-darwin-x64" "4.1.5"
+    "@tailwindcss/oxide-freebsd-x64" "4.1.5"
+    "@tailwindcss/oxide-linux-arm-gnueabihf" "4.1.5"
+    "@tailwindcss/oxide-linux-arm64-gnu" "4.1.5"
+    "@tailwindcss/oxide-linux-arm64-musl" "4.1.5"
+    "@tailwindcss/oxide-linux-x64-gnu" "4.1.5"
+    "@tailwindcss/oxide-linux-x64-musl" "4.1.5"
+    "@tailwindcss/oxide-wasm32-wasi" "4.1.5"
+    "@tailwindcss/oxide-win32-arm64-msvc" "4.1.5"
+    "@tailwindcss/oxide-win32-x64-msvc" "4.1.5"
+
+"@tailwindcss/postcss@^4.1.5":
+  version "4.1.5"
+  resolved "https://registry.npmjs.org/@tailwindcss/postcss/-/postcss-4.1.5.tgz"
+  integrity sha512-5lAC2/pzuyfhsFgk6I58HcNy6vPK3dV/PoPxSDuOTVbDvCddYHzHiJZZInGIY0venvzzfrTEUAXJFULAfFmObg==
+  dependencies:
+    "@alloc/quick-lru" "^5.2.0"
+    "@tailwindcss/node" "4.1.5"
+    "@tailwindcss/oxide" "4.1.5"
+    postcss "^8.4.41"
+    tailwindcss "4.1.5"
+
 "@testing-library/dom@^10.0.0", "@testing-library/dom@^10.4.0", "@testing-library/dom@>=7.21.4":
   version "10.4.0"
   resolved "https://registry.npmjs.org/@testing-library/dom/-/dom-10.4.0.tgz"
@@ -3736,6 +3780,11 @@ destroy@1.2.0:
   resolved "https://registry.npmjs.org/destroy/-/destroy-1.2.0.tgz"
   integrity sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==
 
+detect-libc@^2.0.3:
+  version "2.0.4"
+  resolved "https://registry.npmjs.org/detect-libc/-/detect-libc-2.0.4.tgz"
+  integrity sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==
+
 detect-newline@^3.0.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/detect-newline/-/detect-newline-3.1.0.tgz"
@@ -3961,7 +4010,7 @@ encodeurl@~2.0.0:
   resolved "https://registry.npmjs.org/encodeurl/-/encodeurl-2.0.0.tgz"
   integrity sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==
 
-enhanced-resolve@^5.17.1:
+enhanced-resolve@^5.17.1, enhanced-resolve@^5.18.1:
   version "5.18.1"
   resolved "https://registry.npmjs.org/enhanced-resolve/-/enhanced-resolve-5.18.1.tgz"
   integrity sha512-ZSW3ma5GkcQBIpwZTSRAI8N71Uuwgs93IezB7mf7R60tC8ZbJideoDNKjHn2O9KIlx6rkGTTEk1xUCK2E1Y2Yg==
@@ -6130,6 +6179,11 @@ jiti@^1.21.6:
   resolved "https://registry.npmjs.org/jiti/-/jiti-1.21.7.tgz"
   integrity sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==
 
+jiti@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.npmjs.org/jiti/-/jiti-2.4.2.tgz"
+  integrity sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==
+
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
@@ -6330,6 +6384,29 @@ levn@~0.3.0:
   dependencies:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
+
+lightningcss-win32-x64-msvc@1.29.2:
+  version "1.29.2"
+  resolved "https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.29.2.tgz"
+  integrity sha512-EdIUW3B2vLuHmv7urfzMI/h2fmlnOQBk1xlsDxkN1tCWKjNFjfLhGxYk8C8mzpSfr+A6jFFIi8fU6LbQGsRWjA==
+
+lightningcss@1.29.2:
+  version "1.29.2"
+  resolved "https://registry.npmjs.org/lightningcss/-/lightningcss-1.29.2.tgz"
+  integrity sha512-6b6gd/RUXKaw5keVdSEtqFVdzWnU5jMxTUjA2bVcMNPLwSQ08Sv/UodBVtETLCn7k4S1Ibxwh7k68IwLZPgKaA==
+  dependencies:
+    detect-libc "^2.0.3"
+  optionalDependencies:
+    lightningcss-darwin-arm64 "1.29.2"
+    lightningcss-darwin-x64 "1.29.2"
+    lightningcss-freebsd-x64 "1.29.2"
+    lightningcss-linux-arm-gnueabihf "1.29.2"
+    lightningcss-linux-arm64-gnu "1.29.2"
+    lightningcss-linux-arm64-musl "1.29.2"
+    lightningcss-linux-x64-gnu "1.29.2"
+    lightningcss-linux-x64-musl "1.29.2"
+    lightningcss-win32-arm64-msvc "1.29.2"
+    lightningcss-win32-x64-msvc "1.29.2"
 
 lilconfig@^2.0.3:
   version "2.1.0"
@@ -7623,7 +7700,7 @@ postcss-value-parser@^4.0.0, postcss-value-parser@^4.1.0, postcss-value-parser@^
   resolved "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-"postcss@^7.0.0 || ^8.0.1", postcss@^8, postcss@^8.0.0, postcss@^8.0.3, postcss@^8.0.9, postcss@^8.1.0, postcss@^8.1.4, postcss@^8.2, postcss@^8.2.14, postcss@^8.2.15, postcss@^8.2.2, postcss@^8.3, postcss@^8.3.5, postcss@^8.4, postcss@^8.4.21, postcss@^8.4.33, postcss@^8.4.4, postcss@^8.4.47, postcss@^8.4.6, postcss@^8.5.3, "postcss@>= 8", postcss@>=8, postcss@>=8.0.9:
+"postcss@^7.0.0 || ^8.0.1", postcss@^8, postcss@^8.0.0, postcss@^8.0.3, postcss@^8.0.9, postcss@^8.1.0, postcss@^8.1.4, postcss@^8.2, postcss@^8.2.14, postcss@^8.2.15, postcss@^8.2.2, postcss@^8.3, postcss@^8.3.5, postcss@^8.4, postcss@^8.4.21, postcss@^8.4.33, postcss@^8.4.4, postcss@^8.4.41, postcss@^8.4.47, postcss@^8.4.6, postcss@^8.5.3, "postcss@>= 8", postcss@>=8, postcss@>=8.0.9:
   version "8.5.3"
   resolved "https://registry.npmjs.org/postcss/-/postcss-8.5.3.tgz"
   integrity sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==
@@ -8963,7 +9040,7 @@ tailwindcss@^3.0.2:
     resolve "^1.22.8"
     sucrase "^3.35.0"
 
-tailwindcss@^4.1.5:
+tailwindcss@^4.1.5, tailwindcss@4.1.5:
   version "4.1.5"
   resolved "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.5.tgz"
   integrity sha512-nYtSPfWGDiWgCkwQG/m+aX83XCwf62sBgg3bIlNiiOcggnS1x3uVRDAuyelBFL+vJdOPPCGElxv9DjHJjRHiVA==
