@@ -1,118 +1,105 @@
-/* Aseguramos que Tailwind CSS esté importado correctamente */
+/* App.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Personalización de colores y fondo para el modo claro y oscuro */
-body {
-  @apply bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100;
-  font-family: 'Arial', sans-serif;
+/* Transiciones y animaciones */
+.task-card {
+  @apply transition-transform duration-200 ease-in-out;
 }
 
-/* Estructura general y fondo */
-.App {
-  @apply bg-gray-50 min-h-screen p-6;
+.task-card:hover {
+  @apply transform -translate-y-0.5 shadow-lg;
 }
 
-/* Estilo del encabezado (header) */
-.header {
-  @apply bg-blue-600 text-white p-4 rounded-md shadow-lg text-center;
+.btn {
+  @apply transition-all duration-200;
 }
 
-.header h1 {
-  @apply text-3xl font-bold;
+.btn:hover {
+  @apply transform -translate-y-0.5;
 }
 
-/* Área de resumen del proyecto */
-.dashboard {
-  @apply p-6 bg-gray-200 rounded-lg shadow-md mb-6;
+.btn:active {
+  @apply transform translate-y-0;
 }
 
-.dashboard h2 {
-  @apply text-xl font-semibold mb-4;
+.task-column {
+  @apply min-h-[200px];
 }
 
-/* Estilo para las secciones de tareas y proyectos */
-.section {
-  @apply mb-8;
+/* Efecto skeleton loading */
+.skeleton {
+  @apply animate-pulse bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 bg-[length:200%_100%];
 }
 
-.section h2 {
-  @apply text-2xl font-semibold text-blue-700 mb-4;
+/* Notificaciones */
+.notification-dot {
+  @apply absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500;
 }
 
-/* Listado de proyectos */
-.project-item {
-  @apply p-4 bg-white rounded-lg shadow-sm mb-4 text-gray-700;
-  border: 1px solid #e2e8f0;
+.notification-badge {
+  @apply absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-xs flex items-center justify-center px-1;
 }
 
-/* Entrada de formulario (inputs, selects) */
-input,
-select {
-  @apply block w-full p-4 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400;
+/* Animaciones */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
 }
 
-input[type="date"] {
-  @apply w-auto;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Botones (incluyendo hover y focus) */
-button {
-  @apply p-3 bg-blue-600 text-white rounded-lg shadow-md cursor-pointer transition-all hover:bg-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-400;
+.slide-in {
+  animation: slideIn 0.3s ease-out;
 }
 
-button:focus {
-  @apply border-2 border-blue-500;
+@keyframes slideIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-button:hover {
-  @apply bg-blue-500;
+.task-complete {
+  animation: taskComplete 0.5s ease-out;
 }
 
-/* Estilo para las columnas Kanban */
-.kanban-board {
-  @apply flex gap-6;
+@keyframes taskComplete {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
-.kanban-column {
-  @apply w-1/3 p-4 bg-white rounded-lg shadow-md min-h-[300px] mb-4 border border-gray-300;
+/* Modo oscuro */
+.dark .bg-white {
+  @apply bg-gray-800;
 }
 
-/* Tareas dentro de las columnas Kanban */
-.task-item {
-  @apply p-4 mb-4 bg-gray-100 border rounded-lg shadow-sm hover:bg-gray-200 transition-colors ease-in-out;
+.dark .bg-gray-50 {
+  @apply bg-gray-900;
 }
 
-.task-item h3 {
-  @apply text-lg font-semibold;
+.dark .bg-gray-100 {
+  @apply bg-gray-800;
 }
 
-.task-item p {
-  @apply text-sm text-gray-600;
+.dark .text-gray-600 {
+  @apply text-gray-300;
 }
 
-/* Estilo para la vista del TaskBoard */
-.kanban-column h3 {
-  @apply text-lg font-bold text-center mb-4;
+.dark .text-gray-700 {
+  @apply text-gray-200;
 }
 
-.kanban-column ul {
-  @apply space-y-4;
+.dark .text-gray-800 {
+  @apply text-gray-100;
 }
 
-/* Estilo para agregar tareas y proyectos (formularios) */
-h3 {
-  @apply font-semibold text-xl mb-4;
+.dark .border-gray-200 {
+  @apply border-gray-700;
 }
 
-/* Mejorar accesibilidad en las entradas y botones */
-input:focus, select:focus {
-  @apply ring-2 ring-blue-400;
+.dark .shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
-
-/* Imagen (si se incluye en algún lugar como logo o tarea) */
-img {
-  @apply max-w-full h-auto rounded-md;
-}
-
