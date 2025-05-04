@@ -1,37 +1,118 @@
+/* Aseguramos que Tailwind CSS esté importado correctamente */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos personalizados */
+/* Personalización de colores y fondo para el modo claro y oscuro */
 body {
   @apply bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100;
+  font-family: 'Arial', sans-serif;
 }
 
+/* Estructura general y fondo */
+.App {
+  @apply bg-gray-50 min-h-screen p-6;
+}
+
+/* Estilo del encabezado (header) */
 .header {
-  @apply p-4 text-white bg-blue-500;
+  @apply bg-blue-600 text-white p-4 rounded-md shadow-lg text-center;
 }
 
+.header h1 {
+  @apply text-3xl font-bold;
+}
+
+/* Área de resumen del proyecto */
 .dashboard {
-  @apply p-6 bg-gray-100 rounded-lg shadow-md;
+  @apply p-6 bg-gray-200 rounded-lg shadow-md mb-6;
 }
 
-.kanban-board {
-  @apply flex space-x-4;
+.dashboard h2 {
+  @apply text-xl font-semibold mb-4;
 }
 
-.kanban-column {
-  @apply p-4 bg-gray-200 rounded-lg;
+/* Estilo para las secciones de tareas y proyectos */
+.section {
+  @apply mb-8;
 }
 
-.task-item, .project-item {
-  @apply p-4 bg-gray-200 rounded-lg mb-3;
+.section h2 {
+  @apply text-2xl font-semibold text-blue-700 mb-4;
 }
 
+/* Listado de proyectos */
+.project-item {
+  @apply p-4 bg-white rounded-lg shadow-sm mb-4 text-gray-700;
+  border: 1px solid #e2e8f0;
+}
+
+/* Entrada de formulario (inputs, selects) */
+input,
+select {
+  @apply block w-full p-4 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400;
+}
+
+input[type="date"] {
+  @apply w-auto;
+}
+
+/* Botones (incluyendo hover y focus) */
 button {
-  @apply p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700;
+  @apply p-3 bg-blue-600 text-white rounded-lg shadow-md cursor-pointer transition-all hover:bg-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-400;
 }
 
 button:focus {
-  outline: none;
-  border: 2px solid #0056b3;
+  @apply border-2 border-blue-500;
 }
+
+button:hover {
+  @apply bg-blue-500;
+}
+
+/* Estilo para las columnas Kanban */
+.kanban-board {
+  @apply flex gap-6;
+}
+
+.kanban-column {
+  @apply w-1/3 p-4 bg-white rounded-lg shadow-md min-h-[300px] mb-4 border border-gray-300;
+}
+
+/* Tareas dentro de las columnas Kanban */
+.task-item {
+  @apply p-4 mb-4 bg-gray-100 border rounded-lg shadow-sm hover:bg-gray-200 transition-colors ease-in-out;
+}
+
+.task-item h3 {
+  @apply text-lg font-semibold;
+}
+
+.task-item p {
+  @apply text-sm text-gray-600;
+}
+
+/* Estilo para la vista del TaskBoard */
+.kanban-column h3 {
+  @apply text-lg font-bold text-center mb-4;
+}
+
+.kanban-column ul {
+  @apply space-y-4;
+}
+
+/* Estilo para agregar tareas y proyectos (formularios) */
+h3 {
+  @apply font-semibold text-xl mb-4;
+}
+
+/* Mejorar accesibilidad en las entradas y botones */
+input:focus, select:focus {
+  @apply ring-2 ring-blue-400;
+}
+
+/* Imagen (si se incluye en algún lugar como logo o tarea) */
+img {
+  @apply max-w-full h-auto rounded-md;
+}
+

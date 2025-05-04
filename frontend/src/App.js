@@ -23,7 +23,6 @@ function App() {
   });
 
   useEffect(() => {
-    // Obtener tareas y proyectos al iniciar
     fetch('https://taula.onrender.com/api/tareas')
       .then((res) => res.json())
       .then((data) => {
@@ -42,7 +41,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Inicializar SortableJS para el tablero Kanban
     document.querySelectorAll('.kanban-column').forEach((column) => {
       new Sortable(column, {
         group: 'kanban',
@@ -50,7 +48,7 @@ function App() {
         ghostClass: 'bg-yellow-100',
       });
     });
-  }, [tasks]); // Ejecutamos SortableJS cuando las tareas se cargan o actualizan
+  }, [tasks]);
 
   const handleTaskChange = (e) => {
     const { name, value } = e.target;
@@ -116,11 +114,12 @@ function App() {
 
   return (
     <div className="App">
-      <header className="header bg-blue-500 text-white p-4 text-center">
+      <header className="header">
+        <img src="https://via.placeholder.com/150" alt="Logo" className="mx-auto mb-4" />
         <h1>Dashboard de Tareas</h1>
       </header>
 
-      <div className="dashboard p-6 bg-gray-100 rounded-lg shadow-md">
+      <div className="dashboard">
         <h2>Resumen del Proyecto</h2>
         <p>Total de tareas: {tasks.length}</p>
         <p>Total de proyectos: {projects.length}</p>
@@ -133,7 +132,7 @@ function App() {
         ) : (
           <ul>
             {projects.map((proj) => (
-              <li key={proj.id} className="project-item p-4 bg-gray-200 rounded-lg mb-3">
+              <li key={proj.id} className="project-item">
                 <strong>{proj.nombre}</strong> - {proj.descripcion}
               </li>
             ))}
@@ -165,12 +164,13 @@ function App() {
         ) : tasks.length === 0 ? (
           <p>No hay tareas disponibles.</p>
         ) : (
-          <div className="kanban-board flex space-x-4">
-            <div className="kanban-column bg-blue-100 p-4 rounded-lg w-1/4">
+          <div className="kanban-board">
+            <div className="kanban-column">
               <h3>Pendiente</h3>
               <ul>
                 {tasks.filter(task => task.estado === 'Pendiente').map((task) => (
-                  <li key={task.id} className="task-item p-4 bg-gray-200 rounded-lg mb-3">
+                  <li key={task.id} className="task-item">
+                    <img src={task.imageUrl || 'https://via.placeholder.com/40'} alt={task.tarea} className="w-16 h-16 rounded-full mb-4" />
                     <h3>{task.tarea}</h3>
                     <p><strong>Proyecto:</strong> {task.proyecto}</p>
                     <p><strong>Responsable:</strong> {task.responsable}</p>
@@ -178,11 +178,12 @@ function App() {
                 ))}
               </ul>
             </div>
-            <div className="kanban-column bg-yellow-100 p-4 rounded-lg w-1/4">
+            <div className="kanban-column">
               <h3>En progreso</h3>
               <ul>
                 {tasks.filter(task => task.estado === 'En progreso').map((task) => (
-                  <li key={task.id} className="task-item p-4 bg-gray-200 rounded-lg mb-3">
+                  <li key={task.id} className="task-item">
+                    <img src={task.imageUrl || 'https://via.placeholder.com/40'} alt={task.tarea} className="w-16 h-16 rounded-full mb-4" />
                     <h3>{task.tarea}</h3>
                     <p><strong>Proyecto:</strong> {task.proyecto}</p>
                     <p><strong>Responsable:</strong> {task.responsable}</p>
@@ -190,11 +191,12 @@ function App() {
                 ))}
               </ul>
             </div>
-            <div className="kanban-column bg-green-100 p-4 rounded-lg w-1/4">
+            <div className="kanban-column">
               <h3>Completadas</h3>
               <ul>
                 {tasks.filter(task => task.estado === 'Completada').map((task) => (
-                  <li key={task.id} className="task-item p-4 bg-gray-200 rounded-lg mb-3">
+                  <li key={task.id} className="task-item">
+                    <img src={task.imageUrl || 'https://via.placeholder.com/40'} alt={task.tarea} className="w-16 h-16 rounded-full mb-4" />
                     <h3>{task.tarea}</h3>
                     <p><strong>Proyecto:</strong> {task.proyecto}</p>
                     <p><strong>Responsable:</strong> {task.responsable}</p>
