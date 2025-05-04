@@ -9,3 +9,36 @@ body {
   font-family: 'Inter', sans-serif;
   @apply bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100;
 }
+
+/* Componentes personalizados */
+.task-card {
+  @apply bg-white border border-gray-200 rounded-lg p-4 mb-3 cursor-move transition-all duration-200 hover:shadow-card dark:bg-gray-800 dark:border-gray-700;
+}
+
+.notification-badge {
+  @apply absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-xs flex items-center justify-center px-1;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Progress ring */
+.progress-ring circle {
+  @apply transition-all duration-300;
+}
+
+/* Modo oscuro personalizado */
+.dark .task-card {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.dark .notification-badge {
+  @apply bg-red-600;
+}

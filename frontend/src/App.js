@@ -58,7 +58,7 @@ function App() {
 
   // Inicializar SortableJS
   useEffect(() => {
-    document.querySelectorAll('.kanban-column').forEach((column) => {
+    document.querySelectorAll('.task-column').forEach((column) => {
       new Sortable(column, {
         group: 'kanban',
         animation: 150,
@@ -377,8 +377,9 @@ function App() {
             <p className="text-gray-600 mt-1 dark:text-gray-300">Bienvenido de nuevo, Carlos. Aquí está el resumen de tus tareas.</p>
           </div>
 
-          {/* Stats Cards */}
+          {/* Stats Cards - Versión exacta al diseño */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {/* Tarjeta Tareas Totales */}
             <div className="bg-white rounded-lg shadow p-5 dark:bg-gray-800">
               <div className="flex items-center justify-between">
                 <div>
@@ -391,8 +392,18 @@ function App() {
                   </svg>
                 </div>
               </div>
+              <div className="mt-4 flex items-center">
+                <span className="text-green-500 text-sm font-medium flex items-center dark:text-green-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  8%
+                </span>
+                <span className="text-gray-500 text-sm ml-2 dark:text-gray-400">vs semana anterior</span>
+              </div>
             </div>
-            
+
+            {/* Tarjeta Tareas Completadas */}
             <div className="bg-white rounded-lg shadow p-5 dark:bg-gray-800">
               <div className="flex items-center justify-between">
                 <div>
@@ -405,8 +416,18 @@ function App() {
                   </svg>
                 </div>
               </div>
+              <div className="mt-4 flex items-center">
+                <span className="text-green-500 text-sm font-medium flex items-center dark:text-green-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  12%
+                </span>
+                <span className="text-gray-500 text-sm ml-2 dark:text-gray-400">vs semana anterior</span>
+              </div>
             </div>
-            
+
+            {/* Tarjeta Tareas Pendientes */}
             <div className="bg-white rounded-lg shadow p-5 dark:bg-gray-800">
               <div className="flex items-center justify-between">
                 <div>
@@ -415,12 +436,22 @@ function App() {
                 </div>
                 <div className="bg-yellow-100 p-3 rounded-full dark:bg-yellow-900/50">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-14 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
+              <div className="mt-4 flex items-center">
+                <span className="text-red-500 text-sm font-medium flex items-center dark:text-red-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                  5%
+                </span>
+                <span className="text-gray-500 text-sm ml-2 dark:text-gray-400">vs semana anterior</span>
+              </div>
             </div>
-            
+
+            {/* Tarjeta Tareas en Progreso */}
             <div className="bg-white rounded-lg shadow p-5 dark:bg-gray-800">
               <div className="flex items-center justify-between">
                 <div>
@@ -433,125 +464,196 @@ function App() {
                   </svg>
                 </div>
               </div>
+              <div className="mt-4 flex items-center">
+                <span className="text-green-500 text-sm font-medium flex items-center dark:text-green-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  3%
+                </span>
+                <span className="text-gray-500 text-sm ml-2 dark:text-gray-400">vs semana anterior</span>
+              </div>
             </div>
           </div>
 
-          {/* Kanban Board */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 dark:text-white">Tablero Kanban</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Task Board - Versión exacta al diseño */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-white">Tablero de tareas</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Columna Pendiente */}
-              <div className="kanban-column bg-white rounded-lg shadow p-4 dark:bg-gray-800" data-status="Pendiente">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Pendiente</h3>
-                  <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300">
-                    {filteredTasks('Pendiente').length}
-                  </span>
+              <div className="bg-white rounded-lg shadow dark:bg-gray-800">
+                <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Pendiente</h3>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200">
+                      {filteredTasks('Pendiente').length}
+                    </span>
+                  </div>
                 </div>
-                <ul className="space-y-3">
-                  {filteredTasks('Pendiente').map((task) => (
-                    <li 
-                      key={task.id} 
-                      data-id={task.id}
-                      className="task-item bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-move hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/50">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="p-4 task-column" data-status="Pendiente">
+                  {filteredTasks('Pendiente').map(task => (
+                    <div key={task.id} data-id={task.id} className="task-card mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                      <div className="flex justify-between items-start">
+                        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded dark:bg-green-900 dark:text-green-200">
+                          {task.proyecto}
+                        </span>
+                        <div className="flex space-x-1">
+                          <button className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <h4 className="text-sm font-medium text-gray-800 dark:text-white">{task.tarea}</h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span className="font-medium">Proyecto:</span> {task.proyecto}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            <span className="font-medium">Responsable:</span> {task.responsable}
-                          </p>
+                          </button>
                         </div>
                       </div>
-                    </li>
+                      <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
+                      <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
+                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        {task.responsable}
+                      </div>
+                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {task.fechaFin}
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {/* Columna En progreso */}
-              <div className="kanban-column bg-white rounded-lg shadow p-4 dark:bg-gray-800" data-status="En progreso">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-gray-700 dark:text-gray-300">En progreso</h3>
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                    {filteredTasks('En progreso').length}
-                  </span>
+              {/* Columna En Progreso */}
+              <div className="bg-white rounded-lg shadow dark:bg-gray-800">
+                <div className="p-4 border-b border-gray-200 bg-blue-50 rounded-t-lg dark:bg-blue-900/20 dark:border-gray-600">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-blue-700 dark:text-blue-300">En progreso</h3>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200">
+                      {filteredTasks('En progreso').length}
+                    </span>
+                  </div>
                 </div>
-                <ul className="space-y-3">
-                  {filteredTasks('En progreso').map((task) => (
-                    <li 
-                      key={task.id} 
-                      data-id={task.id}
-                      className="task-item bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-move hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center dark:bg-purple-900/50">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-500 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <div className="p-4 task-column" data-status="En progreso">
+                  {filteredTasks('En progreso').map(task => (
+                    <div key={task.id} data-id={task.id} className="task-card mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                      <div className="flex justify-between items-start">
+                        <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded dark:bg-blue-900 dark:text-blue-200">
+                          {task.proyecto}
+                        </span>
+                        <div className="flex space-x-1">
+                          <button className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <h4 className="text-sm font-medium text-gray-800 dark:text-white">{task.tarea}</h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span className="font-medium">Proyecto:</span> {task.proyecto}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            <span className="font-medium">Responsable:</span> {task.responsable}
-                          </p>
+                          </button>
                         </div>
                       </div>
-                    </li>
+                      <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
+                      <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
+                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        {task.responsable}
+                      </div>
+                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {task.fechaFin}
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
+              </div>
+
+              {/* Columna Revisión */}
+              <div className="bg-white rounded-lg shadow dark:bg-gray-800">
+                <div className="p-4 border-b border-gray-200 bg-yellow-50 rounded-t-lg dark:bg-yellow-900/20 dark:border-gray-600">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Revisión</h3>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
+                      {filteredTasks('Revisión').length}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4 task-column" data-status="Revisión">
+                  {filteredTasks('Revisión').map(task => (
+                    <div key={task.id} data-id={task.id} className="task-card mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                      <div className="flex justify-between items-start">
+                        <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded dark:bg-yellow-900 dark:text-yellow-200">
+                          {task.proyecto}
+                        </span>
+                        <div className="flex space-x-1">
+                          <button className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
+                      <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
+                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        {task.responsable}
+                      </div>
+                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {task.fechaFin}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Columna Completada */}
-              <div className="kanban-column bg-white rounded-lg shadow p-4 dark:bg-gray-800" data-status="Completada">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Completada</h3>
-                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                    {filteredTasks('Completada').length}
-                  </span>
+              <div className="bg-white rounded-lg shadow dark:bg-gray-800">
+                <div className="p-4 border-b border-gray-200 bg-green-50 rounded-t-lg dark:bg-green-900/20 dark:border-gray-600">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-green-700 dark:text-green-300">Completada</h3>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
+                      {filteredTasks('Completada').length}
+                    </span>
+                  </div>
                 </div>
-                <ul className="space-y-3">
-                  {filteredTasks('Completada').map((task) => (
-                    <li 
-                      key={task.id} 
-                      data-id={task.id}
-                      className="task-item bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-move hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center dark:bg-green-900/50">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                <div className="p-4 task-column" data-status="Completada">
+                  {filteredTasks('Completada').map(task => (
+                    <div key={task.id} data-id={task.id} className="task-card mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                      <div className="flex justify-between items-start">
+                        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded dark:bg-green-900 dark:text-green-200">
+                          {task.proyecto}
+                        </span>
+                        <div className="flex space-x-1">
+                          <button className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <h4 className="text-sm font-medium text-gray-800 dark:text-white">{task.tarea}</h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span className="font-medium">Proyecto:</span> {task.proyecto}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            <span className="font-medium">Responsable:</span> {task.responsable}
-                          </p>
+                          </button>
                         </div>
                       </div>
-                    </li>
+                      <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
+                      <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
+                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        {task.responsable}
+                      </div>
+                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {task.fechaFin}
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -638,6 +740,7 @@ function App() {
                   >
                     <option value="Pendiente">Pendiente</option>
                     <option value="En progreso">En progreso</option>
+                    <option value="Revisión">Revisión</option>
                     <option value="Completada">Completada</option>
                   </select>
                 </div>
