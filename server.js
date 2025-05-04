@@ -80,11 +80,40 @@ app.post('/api/tareas', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en el puerto ${PORT}`);
+// Endpoint para obtener proyectos
+app.get('/api/projects', async (req, res) => {
+  try {
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
+
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const range = 'Proyectos!A2:B';  // Ajusta el rango si tu hoja tiene un formato diferente
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const rows = response.data.values;
+
+    if (!rows || rows.length === 0) {
+      return res.json([]);
+    }
+
+    const projects = rows.map((row, i) => ({
+      id: i + 1,
+      nombre: row[0] || '',
+      descripcion: row[1] || '',
+    }));
+
+    res.json(projects);
+  } catch (error) {
+    console.error('Error al obtener los proyectos:', error);
+    res.status(500).json({ error: 'Error al obtener los proyectos' });
+  }
 });
 
-// Endpoint para agregar un proyecto
+// Endpoint para agregar proyecto
 app.post('/api/proyectos', async (req, res) => {
   try {
     const { nombre, descripcion } = req.body;
@@ -98,7 +127,7 @@ app.post('/api/proyectos', async (req, res) => {
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'Proyectos!A2:B',
+      range: 'Proyectos!A2:B', // Asegúrate de que este rango sea correcto
       valueInputOption: 'RAW',
       requestBody: {
         values: [[nombre, descripcion]],
@@ -110,4 +139,8 @@ app.post('/api/proyectos', async (req, res) => {
     console.error('Error al agregar el proyecto:', error);
     res.status(500).json({ error: 'Error al agregar el proyecto' });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor backend corriendo en el puerto ${PORT}`);
 });
