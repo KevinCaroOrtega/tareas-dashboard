@@ -2,116 +2,216 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  // ============= ESTADOS ORIGINALES (MATRIZ) =============
   const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [newTask, setNewTask] = useState({
-    tarea: "",
-    proyecto: "",
-    responsable: "",
-    fechaInicio: "",
-    fechaFin: "",
-    fechaEjecucion: "",
-    estado: "Pendiente"
+    tarea: '',
+    proyecto: '',
+    responsable: '',
+    fechaInicio: '',
+    fechaFin: '',
+    fechaEjecucion: '',
+    estado: 'Pendiente',
   });
 
-  // ============= FUNCIONES ORIGINALES (MATRIZ) =============
-  const fetchTasks = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/tasks');
-      const data = await response.json();
-      setTasks(data.data);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    } finally {
-      setLoading(false);
-    }
+  const [newProject, setNewProject] = useState({
+    nombre: '',
+    descripcion: '',
+  });
+
+  // Obtener tareas y proyectos al iniciar
+  useEffect(() => {
+    fetch('https://taula.onrender.com/api/tareas')
+      .then((res) => res.json())
+      .then((data) => {
+        setTasks(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error al cargar tareas:', err);
+        setLoading(false);
+      });
+
+    fetch('https://taula.onrender.com/api/projects')
+      .then((res) => res.json())
+      .then((data) => setProjects(data))
+      .catch((err) => console.error('Error al cargar proyectos:', err));
+  }, []);
+
+  const handleTaskChange = (e) => {
+    const { name, value } = e.target;
+    setNewTask({ ...newTask, [name]: value });
+  };
+
+  const handleProjectChange = (e) => {
+    const { name, value } = e.target;
+    setNewProject({ ...newProject, [name]: value });
   };
 
   const handleAddTask = async () => {
+    const { tarea, proyecto, responsable, fechaInicio, fechaFin } = newTask;
+    if (!tarea || !proyecto || !responsable || !fechaInicio || !fechaFin) {
+      alert('Completa todos los campos obligatorios de la tarea.');
+      return;
+    }
+
     try {
-      const response = await fetch('/api/tasks', {
+      const res = await fetch('https://taula.onrender.com/api/tareas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTask)
+        body: JSON.stringify(newTask),
       });
-      if (response.ok) fetchTasks();
-    } catch (error) {
-      console.error("Error adding task:", error);
+
+      if (!res.ok) throw new Error('Error al agregar tarea');
+      setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
+      setNewTask({
+        tarea: '',
+        proyecto: '',
+        responsable: '',
+        fechaInicio: '',
+        fechaFin: '',
+        fechaEjecucion: '',
+        estado: 'Pendiente',
+      });
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  // ============= EFECTOS ORIGINALES (MATRIZ) =============
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+  const handleAddProject = async () => {
+    const { nombre, descripcion } = newProject;
+    if (!nombre || !descripcion) {
+      alert('Completa todos los campos del proyecto.');
+      return;
+    }
 
-  // ============= COMPONENTES VISUALES ACTUALIZADOS =============
+    try {
+      const res = await fetch('https://taula.onrender.com/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProject),
+      });
+
+      if (!res.ok) throw new Error('Error al agregar proyecto');
+      setProjects([...projects, { ...newProject, id: projects.length + 1 }]);
+      setNewProject({ nombre: '', descripcion: '' });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="dashboard-container">
-      {/* Sidebar (nuevo diseño) */}
-      <div className="sidebar">
-        <div className="profile-header">
-          <img className="profile-pic" src="/profile.jpg" alt="Usuario"/>
-          <h2>Usuario</h2>
-        </div>
-        <div className="sidebar-card card-green">
-          {tasks.length} Tareas activas
-        </div>
+    <div className="App">
+      <h1>Dashboard de Tareas</h1>
+
+      <div className="dashboard">
+        <h2>Resumen del Proyecto</h2>
+        <p>Total de tareas: {tasks.length}</p>
+        <p>Total de proyectos: {projects.length}</p>
       </div>
 
-      {/* Contenido principal (nuevo diseño) */}
-      <div className="main-content">
-        <div className="header">
-          <h1>Mis Tareas</h1>
-          <button 
-            className="btn btn-primary"
-            onClick={() => document.getElementById('task-modal').showModal()}
-          >
-            + Nueva Tarea
-          </button>
-        </div>
-
-        {/* Tabla (conserva lógica original) */}
-        <table className="task-table">
-          <thead>
-            <tr>
-              <th>Tarea</th>
-              <th>Proyecto</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map(task => (
-              <tr key={task.id}>
-                <td>{task.tarea}</td>
-                <td>{task.proyecto}</td>
-                <td>
-                  <span className={`badge ${task.estado.toLowerCase()}`}>
-                    {task.estado}
-                  </span>
-                </td>
-              </tr>
+      <div className="section">
+        <h2>Proyectos</h2>
+        {projects.length === 0 ? (
+          <p>No hay proyectos registrados.</p>
+        ) : (
+          <ul>
+            {projects.map((proj) => (
+              <li key={proj.id} className="project-item">
+                <strong>{proj.nombre}</strong> - {proj.descripcion}
+              </li>
             ))}
-          </tbody>
-        </table>
+          </ul>
+        )}
 
-        {/* Modal (misma lógica, nuevo diseño) */}
-        <dialog id="task-modal" className="modal">
-          <div className="modal-content">
-            <h2>Nueva Tarea</h2>
-            <input
-              type="text"
-              placeholder="Nombre tarea"
-              value={newTask.tarea}
-              onChange={(e) => setNewTask({...newTask, tarea: e.target.value})}
-            />
-            <button className="btn" onClick={handleAddTask}>
-              Guardar
-            </button>
-          </div>
-        </dialog>
+        <h3>Agregar nuevo proyecto</h3>
+        <input
+          type="text"
+          name="nombre"
+          value={newProject.nombre}
+          placeholder="Nombre del proyecto"
+          onChange={handleProjectChange}
+        />
+        <input
+          type="text"
+          name="descripcion"
+          value={newProject.descripcion}
+          placeholder="Descripción"
+          onChange={handleProjectChange}
+        />
+        <button onClick={handleAddProject}>Agregar proyecto</button>
+      </div>
+
+      <div className="section">
+        <h2>Tareas</h2>
+        {loading ? (
+          <p>Cargando tareas...</p>
+        ) : tasks.length === 0 ? (
+          <p>No hay tareas disponibles.</p>
+        ) : (
+          <ul>
+            {tasks.map((task) => (
+              <li key={task.id} className="task-item">
+                <h3>{task.tarea}</h3>
+                <p><strong>Proyecto:</strong> {task.proyecto}</p>
+                <p><strong>Responsable:</strong> {task.responsable}</p>
+                <p><strong>Inicio:</strong> {task.fechaInicio}</p>
+                <p><strong>Fin:</strong> {task.fechaFin}</p>
+                <p><strong>Ejecución:</strong> {task.fechaEjecucion}</p>
+                <p><strong>Estado:</strong> {task.estado}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <h3>Agregar nueva tarea</h3>
+        <input
+          type="text"
+          name="tarea"
+          value={newTask.tarea}
+          placeholder="Nombre de la tarea"
+          onChange={handleTaskChange}
+        />
+        <input
+          type="text"
+          name="proyecto"
+          value={newTask.proyecto}
+          placeholder="Proyecto"
+          onChange={handleTaskChange}
+        />
+        <input
+          type="text"
+          name="responsable"
+          value={newTask.responsable}
+          placeholder="Responsable"
+          onChange={handleTaskChange}
+        />
+        <input
+          type="date"
+          name="fechaInicio"
+          value={newTask.fechaInicio}
+          onChange={handleTaskChange}
+        />
+        <input
+          type="date"
+          name="fechaFin"
+          value={newTask.fechaFin}
+          onChange={handleTaskChange}
+        />
+        <input
+          type="date"
+          name="fechaEjecucion"
+          value={newTask.fechaEjecucion}
+          onChange={handleTaskChange}
+        />
+        <select name="estado" value={newTask.estado} onChange={handleTaskChange}>
+          <option value="Pendiente">Pendiente</option>
+          <option value="En progreso">En progreso</option>
+          <option value="Completada">Completada</option>
+        </select>
+        <button onClick={handleAddTask}>Agregar tarea</button>
       </div>
     </div>
   );
