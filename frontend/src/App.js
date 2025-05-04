@@ -10,22 +10,23 @@ function App() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  // Estados existentes
+  // Estados de datos
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const [newTask, setNewTask] = useState({
     tarea: '',
     proyecto: '',
     responsable: '',
     fechaInicio: '',
     fechaFin: '',
-    fechaEjecucion: '',
-    estado: 'Pendiente',
+    estado: 'Pendiente'
   });
+
   const [newProject, setNewProject] = useState({
     nombre: '',
-    descripcion: '',
+    descripcion: ''
   });
 
   // Efecto para el modo oscuro
@@ -37,47 +38,70 @@ function App() {
     }
   }, [darkMode]);
 
-  // Cargar tareas y proyectos
+  // Efecto para cargar datos
   useEffect(() => {
-    fetch('https://taula.onrender.com/api/tareas')
-      .then((res) => res.json())
-      .then((data) => {
-        setTasks(data);
+    const loadData = async () => {
+      try {
+        const [tasksRes, projectsRes] = await Promise.all([
+          fetch('https://taula.onrender.com/api/tareas'),
+          fetch('https://taula.onrender.com/api/projects')
+        ]);
+        
+        const tasksData = await tasksRes.json();
+        const projectsData = await projectsRes.json();
+        
+        setTasks(tasksData);
+        setProjects(projectsData);
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error al cargar tareas:', err);
+      } catch (error) {
+        console.error("Error loading data:", error);
         setLoading(false);
-      });
+      }
+    };
 
-    fetch('https://taula.onrender.com/api/projects')
-      .then((res) => res.json())
-      .then((data) => setProjects(data))
-      .catch((err) => console.error('Error al cargar proyectos:', err));
+    loadData();
   }, []);
 
-  // Inicializar SortableJS
+  // Efecto para SortableJS
   useEffect(() => {
-    document.querySelectorAll('.task-column').forEach((column) => {
-      new Sortable(column, {
-        group: 'kanban',
-        animation: 150,
-        ghostClass: 'bg-yellow-100',
-        onEnd: (evt) => {
-          // Actualizar el estado de la tarea cuando se mueve entre columnas
-          const taskId = evt.item.dataset.id;
-          const newStatus = evt.to.dataset.status;
-          
-          setTasks(prevTasks => 
-            prevTasks.map(task => 
-              task.id === taskId ? {...task, estado: newStatus} : task
-            )
-          );
-        }
+    if (tasks.length > 0) {
+      const columns = document.querySelectorAll('.task-column');
+      columns.forEach(column => {
+        new Sortable(column, {
+          group: 'tasks',
+          animation: 150,
+          onEnd: (evt) => {
+            const taskId = evt.item.dataset.id;
+            const newStatus = evt.to.dataset.status;
+            
+            // Actualizar estado local
+            setTasks(prevTasks => 
+              prevTasks.map(task => 
+                task.id === taskId ? { ...task, estado: newStatus } : task
+              )
+            );
+            
+            // Actualizar en backend
+            updateTaskStatus(taskId, newStatus);
+          }
+        });
       });
-    });
+    }
   }, [tasks]);
 
+  const updateTaskStatus = async (taskId, newStatus) => {
+    try {
+      await fetch(`https://taula.onrender.com/api/tareas/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: newStatus })
+      });
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
+
+  // Manejadores de eventos
   const handleTaskChange = (e) => {
     const { name, value } = e.target;
     setNewTask({ ...newTask, [name]: value });
@@ -89,71 +113,70 @@ function App() {
   };
 
   const handleAddTask = async () => {
-    const { tarea, proyecto, responsable, fechaInicio, fechaFin } = newTask;
-    if (!tarea || !proyecto || !responsable || !fechaInicio || !fechaFin) {
-      alert('Completa todos los campos obligatorios de la tarea.');
-      return;
-    }
-
     try {
       const res = await fetch('https://taula.onrender.com/api/tareas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTask),
+        body: JSON.stringify(newTask)
       });
-
-      if (!res.ok) throw new Error('Error al agregar tarea');
       
-      const newTaskWithId = await res.json();
-      setTasks([...tasks, newTaskWithId]);
+      const addedTask = await res.json();
+      setTasks([...tasks, addedTask]);
       setNewTask({
         tarea: '',
         proyecto: '',
         responsable: '',
         fechaInicio: '',
         fechaFin: '',
-        fechaEjecucion: '',
-        estado: 'Pendiente',
+        estado: 'Pendiente'
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Error adding task:", error);
     }
   };
 
   const handleAddProject = async () => {
-    const { nombre, descripcion } = newProject;
-    if (!nombre || !descripcion) {
-      alert('Completa todos los campos del proyecto.');
-      return;
-    }
-
     try {
       const res = await fetch('https://taula.onrender.com/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProject),
+        body: JSON.stringify(newProject)
       });
-
-      if (!res.ok) throw new Error('Error al agregar proyecto');
       
-      const newProjectWithId = await res.json();
-      setProjects([...projects, newProjectWithId]);
+      const addedProject = await res.json();
+      setProjects([...projects, addedProject]);
       setNewProject({ nombre: '', descripcion: '' });
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Error adding project:", error);
     }
   };
 
-  // Función para filtrar tareas por estado
-  const filteredTasks = (status) => {
-    return tasks.filter(task => task.estado === status);
+  // Filtros y cálculos
+  const filteredTasks = (status) => tasks.filter(task => task.estado === status);
+  
+  const stats = {
+    total: tasks.length,
+    completed: filteredTasks('Completada').length,
+    pending: filteredTasks('Pendiente').length,
+    progress: tasks.length > 0 ? Math.round((filteredTasks('Completada').length / tasks.length) * 100) : 0
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="animate-pulse text-gray-500 dark:text-gray-400">
+          Cargando datos...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen flex flex-col ${darkMode ? 'dark' : ''}`}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30 dark:bg-gray-800 dark:border-gray-700">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Logo y menú móvil */}
           <div className="flex items-center">
             <button 
               onClick={() => setMobileMenuOpen(true)}
@@ -171,6 +194,7 @@ function App() {
             </div>
           </div>
           
+          {/* Barra de búsqueda */}
           <div className="flex-1 mx-4 hidden md:block">
             <div className="relative">
               <input 
@@ -185,6 +209,7 @@ function App() {
             </div>
           </div>
           
+          {/* Controles de usuario */}
           <div className="flex items-center space-x-3">
             <button 
               onClick={() => setCommandPaletteOpen(!commandPaletteOpen)}
@@ -384,7 +409,7 @@ function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium dark:text-gray-400">Tareas totales</p>
-                  <p className="text-2xl font-bold text-gray-800 mt-1 dark:text-white">{tasks.length}</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1 dark:text-white">{stats.total}</p>
                 </div>
                 <div className="bg-blue-100 p-3 rounded-full dark:bg-blue-900/50">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -408,7 +433,7 @@ function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium dark:text-gray-400">Tareas completadas</p>
-                  <p className="text-2xl font-bold text-gray-800 mt-1 dark:text-white">{filteredTasks('Completada').length}</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1 dark:text-white">{stats.completed}</p>
                 </div>
                 <div className="bg-green-100 p-3 rounded-full dark:bg-green-900/50">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -421,9 +446,9 @@ function App() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                   </svg>
-                  12%
+                  {stats.progress}%
                 </span>
-                <span className="text-gray-500 text-sm ml-2 dark:text-gray-400">vs semana anterior</span>
+                <span className="text-gray-500 text-sm ml-2 dark:text-gray-400">de completadas</span>
               </div>
             </div>
 
@@ -432,7 +457,7 @@ function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium dark:text-gray-400">Tareas pendientes</p>
-                  <p className="text-2xl font-bold text-gray-800 mt-1 dark:text-white">{filteredTasks('Pendiente').length}</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1 dark:text-white">{stats.pending}</p>
                 </div>
                 <div className="bg-yellow-100 p-3 rounded-full dark:bg-yellow-900/50">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -507,17 +532,20 @@ function App() {
                       </div>
                       <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
                       <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
-                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        {task.responsable}
-                      </div>
-                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {task.fechaFin}
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden border-2 border-white dark:bg-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="text-xs text-gray-500 ml-2 dark:text-gray-400">{task.responsable || 'Tú'}</span>
+                        </div>
+                        {task.fechaFin && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(task.fechaFin).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -551,17 +579,20 @@ function App() {
                       </div>
                       <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
                       <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
-                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        {task.responsable}
-                      </div>
-                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {task.fechaFin}
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden border-2 border-white dark:bg-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="text-xs text-gray-500 ml-2 dark:text-gray-400">{task.responsable || 'Tú'}</span>
+                        </div>
+                        {task.fechaFin && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(task.fechaFin).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -595,17 +626,20 @@ function App() {
                       </div>
                       <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
                       <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
-                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        {task.responsable}
-                      </div>
-                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {task.fechaFin}
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden border-2 border-white dark:bg-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="text-xs text-gray-500 ml-2 dark:text-gray-400">{task.responsable || 'Tú'}</span>
+                        </div>
+                        {task.fechaFin && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(task.fechaFin).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -639,17 +673,20 @@ function App() {
                       </div>
                       <h4 className="font-medium text-gray-900 mt-2 dark:text-white">{task.tarea}</h4>
                       <p className="text-gray-600 text-sm mt-1 dark:text-gray-300">{task.descripcion || 'Sin descripción'}</p>
-                      <div className="mt-3 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        {task.responsable}
-                      </div>
-                      <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {task.fechaFin}
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden border-2 border-white dark:bg-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="text-xs text-gray-500 ml-2 dark:text-gray-400">{task.responsable || 'Tú'}</span>
+                        </div>
+                        {task.fechaFin && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(task.fechaFin).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
