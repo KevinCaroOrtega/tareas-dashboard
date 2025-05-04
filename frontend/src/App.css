@@ -1,15 +1,16 @@
 /* App.css */
-/* Efectos de animación personalizados */
-.task-card {
-  transition: transform 0.2s, box-shadow 0.2s;
+/* Progress ring - Componente específico */
+.progress-ring {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
 }
 
-.task-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.progress-ring-circle {
+  stroke-dasharray: 283;
+  transition: stroke-dashoffset 0.3s;
 }
 
-/* Animación skeleton loading */
+/* Efecto skeleton loading - Componente específico */
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
@@ -21,56 +22,7 @@
   100% { background-position: -200% 0; }
 }
 
-/* Animaciones personalizadas */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes slideIn {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.slide-in {
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes taskComplete {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-.task-complete {
-  animation: taskComplete 0.5s ease-out;
-}
-
-/* Estilos para el progress ring - específicos para el gráfico circular */
-.progress-ring {
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-}
-
-.progress-ring-circle {
-  stroke-dasharray: 283;
-  transition: stroke-dashoffset 0.3s;
-}
-
-/* Estilos específicos para el calendario */
-.calendar-day {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: relative;
-}
-
+/* Calendar day - Componente específico */
 .calendar-day.has-task::after {
   content: '';
   position: absolute;
@@ -79,10 +31,4 @@
   height: 4px;
   border-radius: 50%;
   background-color: #2563eb;
-}
-
-.calendar-day.today {
-  background-color: #2563eb;
-  color: white;
-  border-radius: 50%;
 }
