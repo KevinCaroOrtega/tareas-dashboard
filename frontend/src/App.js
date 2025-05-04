@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import './App.css';  // Solo para componentes específicos
+import './index.css'; // Estilos globales
 import Sortable from 'sortablejs';
 
 function App() {
